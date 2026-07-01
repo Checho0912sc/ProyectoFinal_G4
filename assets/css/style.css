@@ -1,0 +1,242 @@
+/* Paleta de colores del proyecto */
+:root {
+    --color-principal: #1E3A5F;   /* Navbar, titulos y secciones importantes */
+    --color-secundario: #2E8B57;  /* Botones principales, iconos y acciones positivas */
+    --color-acento: #F2B705;      /* Detalles, etiquetas o elementos destacados */
+    --color-fondo: #F4F6F8;       /* Fondo general de las paginas */
+    --color-blanco: #FFFFFF;      /* Tarjetas, formularios y fondos limpios */
+    --color-texto: #2D2D2D;       /* Texto principal */
+    --color-gris: #6C757D;        /* Textos secundarios o descripciones */
+    --color-borde: #DEE2E6;       /* Bordes de inputs, tablas y tarjetas */
+    --color-error: #DC3545;       /* Mensajes de error o alertas */
+    --color-exito: #198754;       /* Confirmaciones o estados correctos */
+}
+
+/* Padding para que el navbar no tape el contenido */
+.main-content {
+    padding-top: 96px;
+}
+
+/*-------------------- Navbar expandida ------------------- */
+
+.navbar-custom {
+    background-color: transparent;
+    padding: 14px 0;
+}
+
+.navbar-custom .container {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 10px 18px;
+}
+
+.navbar-custom .navbar-brand {
+    color: var(--color-principal);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-custom .navbar-brand i {
+    color: var(--color-secundario);
+    font-size: 1.4rem;
+}
+
+.navbar-custom .nav-link {
+    color: var(--color-texto);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--color-secundario);
+    background-color: #e9f5ee;
+}
+
+.navbar-custom .nav-link.active {
+    color: var(--color-secundario);
+    background-color: #e9f5ee;
+}
+
+.navbar-custom .navbar-toggler {
+    border: none;
+    box-shadow: none;
+}
+
+.navbar-custom .navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.btn-login {
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* -------------------------- Menu lateral cuando la pantalla es pequena ------------------------------ */
+
+.offcanvas-header {
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.offcanvas-title {
+    color: var(--color-principal);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.offcanvas-title i {
+    color: var(--color-secundario);
+}
+
+/* -------------------------------------- Responsive de la navbar ---------------------------------------*/
+
+@media (max-width: 991px) {
+    .navbar-custom .container {
+        width: calc(100% - 24px);
+        border-radius: 20px;
+    }
+
+    .offcanvas-lg {
+        background-color: var(--color-blanco);
+    }
+
+    .offcanvas-body .navbar-nav {
+        align-items: flex-start !important;
+        width: 100%;
+    }
+
+    .navbar-custom .nav-link {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+    }
+
+    .btn-login {
+        width: 100%;
+        justify-content: center;
+        margin-top: 12px;
+    }
+}
+
+
+
+/* --------------------------- Pantalla de inicio de sesion ---------------------------------- */
+.login-seccion {
+    background: linear-gradient(135deg, #f4f6f8 0%, #e9f5ee 100%);
+}
+
+.login-tarjeta {
+    background-color: var(--color-blanco);
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+.login-info {
+    background: linear-gradient(135deg, var(--color-principal), #2e5f8a);
+    color: var(--color-blanco);
+    padding: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.login-info h1 {
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.login-info p {
+    color: #dbe7f3;
+    font-size: 1.05rem;
+    margin-bottom: 30px;
+}
+
+.login-icono {
+    font-size: 3rem;
+    color: var(--color-acento);
+    margin-bottom: 20px;
+}
+
+.login-beneficio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.login-beneficio i {
+    color: var(--color-acento);
+}
+
+.login-formulario {
+    padding: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.login-formulario-contenido {
+    width: 100%;
+}
+
+.login-formulario h2 {
+    color: var(--color-principal);
+    font-weight: 800;
+}
+
+.login-formulario .form-label {
+    font-weight: 600;
+    color: var(--color-texto);
+}
+
+.login-formulario .input-group-text {
+    background-color: var(--color-fondo);
+    color: var(--color-secundario);
+    border-right: none;
+}
+
+.login-formulario .form-control {
+    border-left: none;
+}
+
+.login-formulario .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.login-link {
+    color: var(--color-secundario);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 991px) {
+    .login-info,
+    .login-formulario {
+        padding: 35px;
+    }
+
+    .login-info {
+        text-align: center;
+    }
+
+    .login-beneficio {
+        justify-content: center;
+    }
+}
