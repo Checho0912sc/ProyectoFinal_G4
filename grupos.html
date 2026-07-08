@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComuniGest | Grupos de Trabajo</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons de bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <!-- Navbar reutilizable -->
+    <div id="navbar"></div>
+
+    <!-- Grupos de trabajo -->
+    <main class="main-content">
+        <section class="dashboard-section py-5">
+            <div class="container">
+
+                <!-- Encabezado -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-12 col-lg-8">
+                        <span class="badge text-bg-success mb-3">Gestión de grupos</span>
+                        <h1 class="dashboard-title">Comités y Grupos de Trabajo</h1>
+                        <p class="dashboard-text">
+                            Organización de comités y equipos responsables de apoyar proyectos, actividades y tareas
+                            específicas de la asociación.
+                        </p>
+                    </div>
+
+                    <div class="col-12 col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalCrearGrupo">
+                            <i class="bi bi-plus-circle"></i>
+                            Crear grupo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de resumen -->
+                <div class="row g-4 mb-5">
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="dashboard-resumen-card">
+                            <div class="dashboard-resumen-icono">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <div>
+                                <h3>4</h3>
+                                <h6>Comités activos</h6>
+                                <p>Áreas de acción clave</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="dashboard-resumen-card">
+                            <div class="dashboard-resumen-icono">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h3>20</h3>
+                                <h6>Miembros asignados</h6>
+                                <p>Vecinos voluntarios activos</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="dashboard-resumen-card">
+                            <div class="dashboard-resumen-icono">
+                                <i class="bi bi-list-task"></i>
+                            </div>
+                            <div>
+                                <h3>8</h3>
+                                <h6>Tareas en curso</h6>
+                                <p>En ejecución por comités</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="dashboard-resumen-card">
+                            <div class="dashboard-resumen-icono">
+                                <i class="bi bi-folder-check"></i>
+                            </div>
+                            <div>
+                                <h3>4</h3>
+                                <h6>Proyectos apoyados</h6>
+                                <p>Vinculados a comités</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Cuerpo -->
+                <div class="row g-4">
+
+                    <!-- Directorio de comités -->
+                    <div class="col-12 col-xl-8">
+                        <div class="dashboard-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h4>Directorio de comités</h4>
+                                    <p class="text-muted mb-0">Comités y grupos registrados en la asociación.</p>
+                                </div>
+                                <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#modalAsociarMiembro">
+                                    <i class="bi bi-person-plus"></i>
+                                    Asociar miembro
+                                </button>
+                            </div>
+
+                            <!-- Tabla de comités -->
+                            <div class="table-responsive">
+                                <table class="table align-middle dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Comité</th>
+                                            <th>Área</th>
+                                            <th>Responsable</th>
+                                            <th>Miembros</th>
+                                            <th>Proyecto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Comité de Medio Ambiente</strong></td>
+                                            <td><span class="badge text-bg-success">Ecología</span></td>
+                                            <td>Carlos Méndez</td>
+                                            <td>7</td>
+                                            <td><span class="text-muted small">Campaña de reciclaje</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Comité de Obras y Espacios</strong></td>
+                                            <td><span class="badge text-bg-primary">Infraestructura</span></td>
+                                            <td>Ana Rodríguez</td>
+                                            <td>6</td>
+                                            <td><span class="text-muted small">Mejora del parque</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Comité de Educación</strong></td>
+                                            <td><span class="badge text-bg-warning">Social</span></td>
+                                            <td>Luis Fernández</td>
+                                            <td>4</td>
+                                            <td><span class="text-muted small">Taller de tecnología</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Comité de Finanzas</strong></td>
+                                            <td><span class="badge text-bg-danger">Administración</span></td>
+                                            <td>María Solís</td>
+                                            <td>3</td>
+                                            <td><span class="text-muted small">Control general</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Columna lateral -->
+                    <div class="col-12 col-xl-4">
+                        <div class="d-flex flex-column gap-4">
+
+                            <!-- Coordinadores -->
+                            <div class="dashboard-card">
+                                <h4>Coordinadores</h4>
+                                <p class="text-muted">Líderes de comités activos</p>
+
+                                <div class="dashboard-lista">
+
+                                    <div class="dashboard-lista-item">
+                                        <div class="dashboard-lista-icono">
+                                            <i class="bi bi-person-badge"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Carlos Méndez</h6>
+                                            <p>Comité de Medio Ambiente</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="dashboard-lista-item">
+                                        <div class="dashboard-lista-icono">
+                                            <i class="bi bi-person-badge"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Ana Rodríguez</h6>
+                                            <p>Comité de Obras y Espacios</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="dashboard-lista-item">
+                                        <div class="dashboard-lista-icono">
+                                            <i class="bi bi-person-badge"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Luis Fernández</h6>
+                                            <p>Comité de Educación</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="dashboard-lista-item">
+                                        <div class="dashboard-lista-icono">
+                                            <i class="bi bi-person-badge"></i>
+                                        </div>
+                                        <div>
+                                            <h6>María Solís</h6>
+                                            <p>Comité de Finanzas</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Tareas de comités -->
+                            <div class="dashboard-card">
+                                <h4>Tareas actuales</h4>
+                                <p class="text-muted">Estado de responsabilidades asignadas</p>
+
+                                <div class="dashboard-movimiento">
+                                    <div>
+                                        <h6>Instalación de focos LED</h6>
+                                        <p>Comité de Obras</p>
+                                    </div>
+                                    <span class="badge text-bg-warning">En proceso</span>
+                                </div>
+
+                                <div class="dashboard-movimiento">
+                                    <div>
+                                        <h6>Cotización de basureros</h6>
+                                        <p>Comité de Ambiente</p>
+                                    </div>
+                                    <span class="badge text-bg-success">Completado</span>
+                                </div>
+
+                                <div class="dashboard-movimiento">
+                                    <div>
+                                        <h6>Diseño de temarios taller</h6>
+                                        <p>Comité de Educación</p>
+                                    </div>
+                                    <span class="badge text-bg-primary">Planificado</span>
+                                </div>
+
+                                <div class="dashboard-movimiento">
+                                    <div>
+                                        <h6>Presentación presupuestaria</h6>
+                                        <p>Comité de Finanzas</p>
+                                    </div>
+                                    <span class="badge text-bg-warning">En proceso</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Crear grupo -->
+    <div class="modal fade" id="modalCrearGrupo" tabindex="-1" aria-labelledby="modalCrearGrupoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalCrearGrupoLabel">
+                        <i class="bi bi-plus-circle"></i>
+                        Crear nuevo comité
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formNuevoGrupo" onsubmit="event.preventDefault(); alert('Comité registrado.');">
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <label for="nombreGrupo" class="form-label fw-semibold">Nombre del comité</label>
+                                <input type="text" class="form-control" id="nombreGrupo"
+                                    placeholder="Ej. Comité de Seguridad Vecinal" required>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="areaGrupo" class="form-label fw-semibold">Área</label>
+                                <select class="form-select" id="areaGrupo" required>
+                                    <option value="" disabled selected>Seleccione el área</option>
+                                    <option value="ecologia">Ecología y Ambiente</option>
+                                    <option value="infraestructura">Infraestructura y Obras</option>
+                                    <option value="social">Social y Educación</option>
+                                    <option value="administracion">Administración y Tesorería</option>
+                                    <option value="seguridad">Seguridad Comunitaria</option>
+                                    <option value="deportes">Deportes y Recreación</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="responsableGrupo" class="form-label fw-semibold">Responsable</label>
+                                <input type="text" class="form-control" id="responsableGrupo"
+                                    placeholder="Ej. Juan Mora Vargas" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="proyectoGrupo" class="form-label fw-semibold">Proyecto asociado</label>
+                                <select class="form-select" id="proyectoGrupo">
+                                    <option value="" selected>Ninguno / General</option>
+                                    <option value="parque">Mejora del parque comunal</option>
+                                    <option value="reciclaje">Campaña de reciclaje</option>
+                                    <option value="iluminacion">Iluminación de zonas comunes</option>
+                                    <option value="taller">Taller de tecnología</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="descripcionGrupo" class="form-label fw-semibold">Objetivos</label>
+                                <textarea class="form-control" id="descripcionGrupo" rows="3"
+                                    placeholder="Describa el propósito y tareas del comité..." required></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">
+                                <i class="bi bi-save"></i>
+                                Guardar comité
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asociar miembro -->
+    <div class="modal fade" id="modalAsociarMiembro" tabindex="-1" aria-labelledby="modalAsociarMiembroLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalAsociarMiembroLabel">
+                        <i class="bi bi-person-plus"></i>
+                        Asociar miembro al comité
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formAsociarMiembro" onsubmit="event.preventDefault(); alert('Miembro asociado.');">
+                        <div class="row g-3">
+
+                            <div class="col-12">
+                                <label for="selectGrupoAsociar" class="form-label fw-semibold">Comité</label>
+                                <select class="form-select" id="selectGrupoAsociar" required>
+                                    <option value="" disabled selected>Seleccione un comité</option>
+                                    <option value="medioambiente">Comité de Medio Ambiente</option>
+                                    <option value="obras">Comité de Obras y Espacios</option>
+                                    <option value="educacion">Comité de Educación</option>
+                                    <option value="finanzas">Comité de Finanzas</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="selectMiembroAsociar" class="form-label fw-semibold">Miembro</label>
+                                <select class="form-select" id="selectMiembroAsociar" required>
+                                    <option value="" disabled selected>Seleccione un vecino</option>
+                                    <option value="1">Juan Mora (Colaborador)</option>
+                                    <option value="2">Karol Rojas (Vecino)</option>
+                                    <option value="3">Pedro Arias (Vecino)</option>
+                                    <option value="4">Sofía Vargas (Voluntario)</option>
+                                    <option value="5">Andrés Cascante (Vecino)</option>
+                                    <option value="6">Lucía Méndez (Colaborador)</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="rolMiembroComite" class="form-label fw-semibold">Rol asignado</label>
+                                <select class="form-select" id="rolMiembroComite" required>
+                                    <option value="colaborador" selected>Colaborador / Voluntario</option>
+                                    <option value="secretario">Secretario</option>
+                                    <option value="vocal">Vocal</option>
+                                    <option value="tesorero">Sub-tesorero</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success" data-bs-dismiss="modal">
+                                <i class="bi bi-check-circle"></i>
+                                Asociar miembro
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JS para cargar layout -->
+    <script src="assets/js/layout.js"></script>
+</body>
+
+</html>
