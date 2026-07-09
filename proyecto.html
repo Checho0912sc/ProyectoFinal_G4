@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComuniGest | Proyectos</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div id="navbar"></div>
+
+    <main class="main-content">
+        <section class="modulo-section py-5">
+            <div class="container">
+
+                <!-- Encabezado -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-12 col-lg-8">
+                        <span class="badge text-bg-success mb-3">Gestión de proyectos</span>
+                        <h1 class="modulo-title">Proyectos comunitarios</h1>
+                        <p class="modulo-text">
+                            Registro, seguimiento y control de proyectos desarrollados por la asociación.
+                        </p>
+                    </div>
+
+                    <div class="col-12 col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <button class="btn btn-success btn-lg">
+                            <i class="bi bi-plus-circle"></i>
+                            Nuevo proyecto
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- Formulario -->
+                    <div class="col-12 col-xl-4">
+                        <div class="modulo-card h-100">
+                            <h4>Registrar proyecto</h4>
+                            <p class="text-muted">Complete la información principal del proyecto.</p>
+
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre del proyecto</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-folder-check"></i>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Ej: Mejora del parque comunal">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Grupo responsable</label>
+                                    <select class="form-select">
+                                        <option selected>Seleccione un grupo</option>
+                                        <option>Comité de infraestructura</option>
+                                        <option>Comité ambiental</option>
+                                        <option>Comité social</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Responsable</label>
+                                    <select class="form-select">
+                                        <option selected>Seleccione un responsable</option>
+                                        <option>Ana Rodríguez</option>
+                                        <option>Carlos Méndez</option>
+                                        <option>María Solís</option>
+                                        <option>Luis Fernández</option>
+                                    </select>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <label class="form-label">Fecha inicio</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <label class="form-label">Fecha fin</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Presupuesto</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₡</span>
+                                        <input type="number" class="form-control" placeholder="250000">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Estado</label>
+                                    <select class="form-select">
+                                        <option selected>Planificado</option>
+                                        <option>En proceso</option>
+                                        <option>Activo</option>
+                                        <option>Finalizado</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea class="form-control" rows="4" placeholder="Descripción general del proyecto"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-save"></i>
+                                    Guardar proyecto
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tabla -->
+                    <div class="col-12 col-xl-8">
+                        <div class="modulo-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h4>Proyectos registrados</h4>
+                                    <p class="text-muted mb-0">Control de proyectos comunitarios activos y planificados.</p>
+                                </div>
+
+                                <button class="btn btn-outline-success">
+                                    <i class="bi bi-funnel"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-middle modulo-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Proyecto</th>
+                                            <th>Responsable</th>
+                                            <th>Estado</th>
+                                            <th>Presupuesto</th>
+                                            <th>Avance</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Mejora del parque comunal</td>
+                                            <td>Ana Rodríguez</td>
+                                            <td><span class="badge text-bg-success">Activo</span></td>
+                                            <td>₡350.000</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-success" style="width: 75%"></div>
+                                                    </div>
+                                                    <span>75%</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Campaña de reciclaje</td>
+                                            <td>Carlos Méndez</td>
+                                            <td><span class="badge text-bg-warning">En proceso</span></td>
+                                            <td>₡120.000</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-success" style="width: 50%"></div>
+                                                    </div>
+                                                    <span>50%</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Iluminación de zonas comunes</td>
+                                            <td>María Solís</td>
+                                            <td><span class="badge text-bg-primary">Planificado</span></td>
+                                            <td>₡500.000</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-success" style="width: 25%"></div>
+                                                    </div>
+                                                    <span>25%</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Taller de tecnología</td>
+                                            <td>Luis Fernández</td>
+                                            <td><span class="badge text-bg-success">Activo</span></td>
+                                            <td>₡80.000</td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1">
+                                                        <div class="progress-bar bg-success" style="width: 60%"></div>
+                                                    </div>
+                                                    <span>60%</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Layout -->
+    <script src="assets/js/layout.js"></script>
+</body>
+</html>

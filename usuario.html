@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComuniGest | Usuarios</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div id="navbar"></div>
+
+    <main class="main-content">
+        <section class="modulo-section py-5">
+            <div class="container">
+
+                <!-- Encabezado -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-12 col-lg-8">
+                        <span class="badge text-bg-success mb-3">Gestión de usuarios</span>
+                        <h1 class="modulo-title">Usuarios y roles</h1>
+                        <p class="modulo-text">
+                            Administración de miembros de la asociación, roles asignados y estado dentro del sistema.
+                        </p>
+                    </div>
+
+                    <div class="col-12 col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <button class="btn btn-success btn-lg">
+                            <i class="bi bi-person-plus"></i>
+                            Nuevo usuario
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- Formulario -->
+                    <div class="col-12 col-xl-4">
+                        <div class="modulo-card h-100">
+                            <h4>Registrar usuario</h4>
+                            <p class="text-muted">Complete los datos del nuevo miembro.</p>
+
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre completo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-person"></i>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="Ej: Ana Rodríguez">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Correo electrónico</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-envelope"></i>
+                                        </span>
+                                        <input type="email" class="form-control" placeholder="correo@ejemplo.com">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Teléfono</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-telephone"></i>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="8888-8888">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Rol</label>
+                                    <select class="form-select">
+                                        <option selected>Seleccione un rol</option>
+                                        <option>Administrador</option>
+                                        <option>Coordinador</option>
+                                        <option>Miembro</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Estado</label>
+                                    <select class="form-select">
+                                        <option selected>Activo</option>
+                                        <option>Inactivo</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-save"></i>
+                                    Guardar usuario
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tabla -->
+                    <div class="col-12 col-xl-8">
+                        <div class="modulo-card">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h4>Usuarios registrados</h4>
+                                    <p class="text-muted mb-0">Listado general de miembros de la asociación.</p>
+                                </div>
+
+                                <button class="btn btn-outline-success">
+                                    <i class="bi bi-search"></i>
+                                    Buscar
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-middle modulo-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Rol</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Ana Rodríguez</td>
+                                            <td>ana@comunidad.com</td>
+                                            <td>Administrador</td>
+                                            <td><span class="badge text-bg-success">Activo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Carlos Méndez</td>
+                                            <td>carlos@comunidad.com</td>
+                                            <td>Coordinador</td>
+                                            <td><span class="badge text-bg-success">Activo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>María Solís</td>
+                                            <td>maria@comunidad.com</td>
+                                            <td>Miembro</td>
+                                            <td><span class="badge text-bg-secondary">Inactivo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Luis Fernández</td>
+                                            <td>luis@comunidad.com</td>
+                                            <td>Miembro</td>
+                                            <td><span class="badge text-bg-success">Activo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Layout -->
+    <script src="assets/js/layout.js"></script>
+</body>
+</html>

@@ -240,3 +240,129 @@
         justify-content: center;
     }
 }
+
+/* --------------------------- Vistas de modulos generales --------------------------- */
+
+.modulo-section {
+    background-color: var(--color-fondo);
+    min-height: 100vh;
+}
+
+.modulo-title {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.modulo-text {
+    color: var(--color-texto);
+    margin-bottom: 0;
+}
+
+/* Tarjetas principales de los modulos */
+.modulo-card {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.modulo-card h4 {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+/* Formularios */
+.modulo-card .form-label {
+    color: var(--color-texto);
+    font-weight: 600;
+}
+
+.modulo-card .input-group-text {
+    background-color: var(--color-fondo);
+    color: var(--color-secundario);
+    border-color: var(--color-borde);
+}
+
+.modulo-card .form-control,
+.modulo-card .form-select {
+    border-color: var(--color-borde);
+}
+
+.modulo-card .form-control:focus,
+.modulo-card .form-select:focus {
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.15);
+}
+
+/* Tablas */
+.modulo-table {
+    margin-bottom: 0;
+}
+
+.modulo-table thead th {
+    color: var(--color-principal);
+    font-weight: 800;
+    border-bottom: 1px solid var(--color-borde);
+    white-space: nowrap;
+}
+
+.modulo-table tbody td {
+    color: var(--color-texto);
+    border-bottom: 1px solid var(--color-borde);
+    vertical-align: middle;
+}
+
+.modulo-table tbody tr:hover {
+    background-color: #f8fbf9;
+}
+
+/* Botones pequeños de acciones */
+.modulo-table .btn-sm {
+    border-radius: 10px;
+    margin-right: 4px;
+}
+
+/* Barras de progreso */
+.modulo-table .progress {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    min-width: 90px;
+}
+
+.modulo-table .progress-bar {
+    border-radius: 20px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .modulo-card {
+        padding: 22px;
+    }
+
+    .modulo-title {
+        font-size: 2rem;
+    }
+
+    .modulo-table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .modulo-card {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .modulo-title {
+        font-size: 1.7rem;
+    }
+
+    .btn-lg {
+        width: 100%;
+    }
+}
