@@ -1,0 +1,618 @@
+SET NAMES utf8mb4;
+
+CREATE DATABASE IF NOT EXISTS comunigest_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+-- Usuario utilizado por PHP dentro de Docker.
+-- Estas instrucciones deben ejecutarse con un usuario administrador.
+CREATE USER IF NOT EXISTS 'appuser'@'%' IDENTIFIED BY 'apppass';
+GRANT SELECT, INSERT, UPDATE, DELETE
+    ON comunigest_db.*
+    TO 'appuser'@'%';
+
+USE comunigest_db;
+
+CREATE TABLE IF NOT EXISTS comunidades (
+    id_comunidad INT UNSIGNED AUTO_INCREMENT,
+    nombre VARCHAR(120) NOT NULL,
+    descripcion TEXT NULL,
+    estado ENUM('Activa', 'Inactiva') NOT NULL DEFAULT 'Activa',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_comunidades
+        PRIMARY KEY (id_comunidad),
+    CONSTRAINT uq_comunidades_nombre
+        UNIQUE (nombre)
+) ENGINE = InnoDB
+  COMMENT = 'Asociaciones o comunidades administradas por ComuniGest';
+
+CREATE TABLE IF NOT EXISTS roles (
+    id_rol TINYINT UNSIGNED AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(255) NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL DEFAULT 'Activo',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_roles
+        PRIMARY KEY (id_rol),
+    CONSTRAINT uq_roles_nombre
+        UNIQUE (nombre)
+) ENGINE = InnoDB
+  COMMENT = 'Perfiles de acceso disponibles dentro de una comunidad';
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario INT UNSIGNED AUTO_INCREMENT,
+    nombre VARCHAR(120) NOT NULL,
+    correo VARCHAR(191) NOT NULL,
+    contrasena_hash VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20) NULL,
+    estado ENUM('Pendiente', 'Activo', 'Inactivo', 'Bloqueado')
+        NOT NULL DEFAULT 'Activo',
+    ultimo_acceso DATETIME NULL,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_usuarios
+        PRIMARY KEY (id_usuario),
+    CONSTRAINT uq_usuarios_correo
+        UNIQUE (correo),
+    CONSTRAINT chk_usuarios_nombre
+        CHECK (CHAR_LENGTH(TRIM(nombre)) >= 3)
+) ENGINE = InnoDB
+  COMMENT = 'Cuentas globales utilizadas para autenticarse';
+
+
+CREATE TABLE IF NOT EXISTS usuario_comunidad (
+    id_comunidad INT UNSIGNED NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    id_rol TINYINT UNSIGNED NOT NULL,
+    fecha_ingreso DATE NOT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL DEFAULT 'Activo',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_usuario_comunidad
+        PRIMARY KEY (id_comunidad, id_usuario),
+    CONSTRAINT fk_uc_comunidad
+        FOREIGN KEY (id_comunidad)
+        REFERENCES comunidades (id_comunidad)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_uc_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_uc_rol
+        FOREIGN KEY (id_rol)
+        REFERENCES roles (id_rol)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    INDEX idx_uc_usuario (id_usuario),
+    INDEX idx_uc_rol (id_rol),
+    INDEX idx_uc_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Membresia y rol de cada usuario en cada comunidad';
+
+
+CREATE TABLE IF NOT EXISTS grupos (
+    id_grupo INT UNSIGNED AUTO_INCREMENT,
+    id_comunidad INT UNSIGNED NOT NULL,
+    id_responsable INT UNSIGNED NOT NULL,
+    nombre VARCHAR(120) NOT NULL,
+    area VARCHAR(80) NOT NULL,
+    descripcion TEXT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL DEFAULT 'Activo',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_grupos
+        PRIMARY KEY (id_grupo),
+    CONSTRAINT uq_grupos_comunidad_nombre
+        UNIQUE (id_comunidad, nombre),
+    CONSTRAINT fk_grupos_comunidad
+        FOREIGN KEY (id_comunidad)
+        REFERENCES comunidades (id_comunidad)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_grupos_responsable
+        FOREIGN KEY (id_responsable)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    INDEX idx_grupos_responsable (id_responsable),
+    INDEX idx_grupos_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Comites y equipos de trabajo de cada comunidad';
+
+
+CREATE TABLE IF NOT EXISTS usuario_grupo (
+    id_grupo INT UNSIGNED NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    rol_grupo VARCHAR(50) NOT NULL DEFAULT 'Colaborador',
+    fecha_asignacion DATE NOT NULL,
+    estado ENUM('Activo', 'Inactivo') NOT NULL DEFAULT 'Activo',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_usuario_grupo
+        PRIMARY KEY (id_grupo, id_usuario),
+    CONSTRAINT fk_ug_grupo
+        FOREIGN KEY (id_grupo)
+        REFERENCES grupos (id_grupo)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ug_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    INDEX idx_ug_usuario (id_usuario),
+    INDEX idx_ug_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Miembros asignados a grupos y su funcion interna';
+
+CREATE TABLE IF NOT EXISTS proyectos (
+    id_proyecto INT UNSIGNED AUTO_INCREMENT,
+    id_grupo INT UNSIGNED NOT NULL,
+    id_responsable INT UNSIGNED NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion TEXT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NULL,
+    estado ENUM(
+        'Planificado',
+        'En proceso',
+        'Pausado',
+        'Finalizado',
+        'Cancelado'
+    ) NOT NULL DEFAULT 'Planificado',
+    presupuesto DECIMAL(14, 2) NOT NULL DEFAULT 0.00,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_proyectos
+        PRIMARY KEY (id_proyecto),
+    CONSTRAINT uq_proyectos_grupo_nombre
+        UNIQUE (id_grupo, nombre),
+    CONSTRAINT fk_proyectos_grupo
+        FOREIGN KEY (id_grupo)
+        REFERENCES grupos (id_grupo)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_proyectos_responsable
+        FOREIGN KEY (id_responsable)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT chk_proyectos_fechas
+        CHECK (fecha_fin IS NULL OR fecha_fin >= fecha_inicio),
+    CONSTRAINT chk_proyectos_presupuesto
+        CHECK (presupuesto >= 0),
+
+    INDEX idx_proyectos_responsable (id_responsable),
+    INDEX idx_proyectos_estado (estado),
+    INDEX idx_proyectos_fechas (fecha_inicio, fecha_fin)
+) ENGINE = InnoDB
+  COMMENT = 'Proyectos comunitarios administrados por los grupos';
+
+CREATE TABLE IF NOT EXISTS tareas (
+    id_tarea INT UNSIGNED AUTO_INCREMENT,
+    id_proyecto INT UNSIGNED NOT NULL,
+    id_responsable INT UNSIGNED NOT NULL,
+    titulo VARCHAR(150) NOT NULL,
+    descripcion TEXT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NULL,
+    estado ENUM('Pendiente', 'En proceso', 'Finalizada', 'Cancelada')
+        NOT NULL DEFAULT 'Pendiente',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_tareas
+        PRIMARY KEY (id_tarea),
+    CONSTRAINT fk_tareas_proyecto
+        FOREIGN KEY (id_proyecto)
+        REFERENCES proyectos (id_proyecto)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_tareas_responsable
+        FOREIGN KEY (id_responsable)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT chk_tareas_fechas
+        CHECK (fecha_fin IS NULL OR fecha_fin >= fecha_inicio),
+
+    INDEX idx_tareas_proyecto_estado (id_proyecto, estado),
+    INDEX idx_tareas_responsable (id_responsable),
+    INDEX idx_tareas_fechas (fecha_inicio, fecha_fin)
+) ENGINE = InnoDB
+  COMMENT = 'Trabajo necesario para completar cada proyecto';
+
+
+CREATE TABLE IF NOT EXISTS actividades (
+    id_actividad INT UNSIGNED AUTO_INCREMENT,
+    id_comunidad INT UNSIGNED NOT NULL,
+    id_proyecto INT UNSIGNED NULL,
+    id_responsable INT UNSIGNED NOT NULL,
+    titulo VARCHAR(150) NOT NULL,
+    tipo ENUM('Reunion', 'Evento', 'Jornada', 'Proyecto') NOT NULL,
+    descripcion TEXT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    lugar VARCHAR(150) NOT NULL,
+    estado ENUM('Programada', 'Realizada', 'Cancelada')
+        NOT NULL DEFAULT 'Programada',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_actividades
+        PRIMARY KEY (id_actividad),
+    CONSTRAINT fk_actividades_comunidad
+        FOREIGN KEY (id_comunidad)
+        REFERENCES comunidades (id_comunidad)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_actividades_proyecto
+        FOREIGN KEY (id_proyecto)
+        REFERENCES proyectos (id_proyecto)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_actividades_responsable
+        FOREIGN KEY (id_responsable)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    INDEX idx_actividades_comunidad_fecha (id_comunidad, fecha),
+    INDEX idx_actividades_proyecto (id_proyecto),
+    INDEX idx_actividades_responsable (id_responsable),
+    INDEX idx_actividades_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Reuniones, eventos y jornadas de una comunidad';
+
+
+CREATE TABLE IF NOT EXISTS actividad_participacion (
+    id_actividad INT UNSIGNED NOT NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    estado ENUM('Confirmado', 'Asistio', 'Ausente', 'Cancelado')
+        NOT NULL DEFAULT 'Confirmado',
+    fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    observaciones VARCHAR(255) NULL,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_actividad_participacion
+        PRIMARY KEY (id_actividad, id_usuario),
+    CONSTRAINT fk_ap_actividad
+        FOREIGN KEY (id_actividad)
+        REFERENCES actividades (id_actividad)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_ap_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+
+    INDEX idx_ap_usuario (id_usuario),
+    INDEX idx_ap_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Confirmacion y asistencia de usuarios a actividades';
+
+
+CREATE TABLE IF NOT EXISTS movimientos_financieros (
+    id_movimiento INT UNSIGNED AUTO_INCREMENT,
+    id_comunidad INT UNSIGNED NOT NULL,
+    id_proyecto INT UNSIGNED NULL,
+    id_usuario INT UNSIGNED NOT NULL,
+    tipo ENUM('Ingreso', 'Egreso') NOT NULL,
+    descripcion VARCHAR(255) NOT NULL,
+    monto DECIMAL(14, 2) NOT NULL,
+    fecha DATE NOT NULL,
+    estado ENUM('Registrado', 'Anulado') NOT NULL DEFAULT 'Registrado',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_movimientos_financieros
+        PRIMARY KEY (id_movimiento),
+    CONSTRAINT fk_mf_comunidad
+        FOREIGN KEY (id_comunidad)
+        REFERENCES comunidades (id_comunidad)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_mf_proyecto
+        FOREIGN KEY (id_proyecto)
+        REFERENCES proyectos (id_proyecto)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_mf_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES usuarios (id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT chk_mf_monto
+        CHECK (monto > 0),
+
+    INDEX idx_mf_comunidad_fecha (id_comunidad, fecha),
+    INDEX idx_mf_proyecto (id_proyecto),
+    INDEX idx_mf_usuario (id_usuario),
+    INDEX idx_mf_tipo_fecha (tipo, fecha),
+    INDEX idx_mf_estado (estado)
+) ENGINE = InnoDB
+  COMMENT = 'Ingresos y egresos generales o vinculados a proyectos';
+
+
+START TRANSACTION;
+
+INSERT IGNORE INTO roles
+    (id_rol, nombre, descripcion, estado)
+VALUES
+    (1, 'Administrador',
+     'Gestion completa de usuarios, comunidades y modulos.',
+     'Activo'),
+    (2, 'Coordinador',
+     'Gestion de grupos, proyectos, tareas y actividades.',
+     'Activo'),
+    (3, 'Miembro',
+     'Consulta de informacion y participacion en actividades.',
+     'Activo');
+
+INSERT IGNORE INTO comunidades
+    (id_comunidad, nombre, descripcion, estado)
+VALUES
+    (1,
+     'Asociacion de Desarrollo Comunal',
+     'Comunidad inicial utilizada para demostrar los modulos de ComuniGest.',
+     'Activa');
+
+INSERT IGNORE INTO usuarios
+    (id_usuario, nombre, correo, contrasena_hash, telefono, estado)
+VALUES
+    (1, 'Ana Rodriguez', 'ana@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1001', 'Activo'),
+    (2, 'Carlos Mendez', 'carlos@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1002', 'Activo'),
+    (3, 'Maria Solis', 'maria@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1003', 'Activo'),
+    (4, 'Luis Fernandez', 'luis@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1004', 'Activo'),
+    (5, 'Juan Mora', 'juan@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1005', 'Activo'),
+    (6, 'Karol Rojas', 'karol@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1006', 'Activo'),
+    (7, 'Pedro Arias', 'pedro@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1007', 'Activo'),
+    (8, 'Sofia Vargas', 'sofia@comunidad.com',
+     '$2y$10$MUgCmqJv4AwdW53ZHLLoMuu2GV4E/86h.rYx4XlMYsdharCDyC9rO',
+     '8888-1008', 'Activo');
+
+INSERT IGNORE INTO usuario_comunidad
+    (id_comunidad, id_usuario, id_rol, fecha_ingreso, estado)
+VALUES
+    (1, 1, 1, '2026-01-15', 'Activo'),
+    (1, 2, 2, '2026-01-20', 'Activo'),
+    (1, 3, 3, '2026-02-01', 'Activo'),
+    (1, 4, 2, '2026-02-05', 'Activo'),
+    (1, 5, 3, '2026-02-10', 'Activo'),
+    (1, 6, 3, '2026-02-12', 'Activo'),
+    (1, 7, 3, '2026-02-15', 'Activo'),
+    (1, 8, 3, '2026-02-18', 'Activo');
+
+INSERT IGNORE INTO grupos
+    (id_grupo, id_comunidad, id_responsable, nombre, area,
+     descripcion, estado)
+VALUES
+    (1, 1, 2, 'Comite de Medio Ambiente', 'Ecologia y Ambiente',
+     'Coordina reciclaje, reforestacion y proteccion ambiental.',
+     'Activo'),
+    (2, 1, 1, 'Comite de Obras y Espacios', 'Infraestructura y Obras',
+     'Gestiona mejoras de infraestructura y espacios publicos.',
+     'Activo'),
+    (3, 1, 4, 'Comite de Educacion', 'Social y Educacion',
+     'Organiza talleres, capacitaciones y actividades educativas.',
+     'Activo'),
+    (4, 1, 3, 'Comite de Finanzas', 'Administracion y Tesoreria',
+     'Apoya el control financiero y la rendicion de cuentas.',
+     'Activo');
+
+INSERT IGNORE INTO usuario_grupo
+    (id_grupo, id_usuario, rol_grupo, fecha_asignacion, estado)
+VALUES
+    (1, 2, 'Coordinador', '2026-02-20', 'Activo'),
+    (1, 3, 'Secretaria', '2026-02-20', 'Activo'),
+    (1, 6, 'Colaborador', '2026-02-21', 'Activo'),
+    (1, 8, 'Voluntaria', '2026-02-21', 'Activo'),
+    (2, 1, 'Coordinadora', '2026-02-20', 'Activo'),
+    (2, 5, 'Colaborador', '2026-02-22', 'Activo'),
+    (2, 7, 'Vocal', '2026-02-22', 'Activo'),
+    (2, 8, 'Voluntaria', '2026-02-22', 'Activo'),
+    (3, 4, 'Coordinador', '2026-02-25', 'Activo'),
+    (3, 6, 'Secretaria', '2026-02-25', 'Activo'),
+    (3, 7, 'Colaborador', '2026-02-25', 'Activo'),
+    (4, 3, 'Tesorera', '2026-02-28', 'Activo'),
+    (4, 1, 'Fiscal', '2026-02-28', 'Activo'),
+    (4, 5, 'Colaborador', '2026-02-28', 'Activo');
+
+INSERT IGNORE INTO proyectos
+    (id_proyecto, id_grupo, id_responsable, nombre, descripcion,
+     fecha_inicio, fecha_fin, estado, presupuesto)
+VALUES
+    (1, 2, 1, 'Mejora del parque comunal',
+     'Restauracion, pintura y mejora de las zonas recreativas.',
+     '2026-07-01', '2026-09-30', 'En proceso', 350000.00),
+    (2, 1, 2, 'Campana de reciclaje',
+     'Programa comunitario de separacion y recoleccion de residuos.',
+     '2026-06-15', '2026-10-15', 'En proceso', 120000.00),
+    (3, 2, 3, 'Iluminacion de zonas comunes',
+     'Instalacion y mejora de luminarias en espacios comunales.',
+     '2026-08-01', '2026-11-30', 'Planificado', 500000.00),
+    (4, 3, 4, 'Taller de tecnologia',
+     'Capacitaciones basicas de tecnologia para la comunidad.',
+     '2026-07-05', '2026-09-15', 'En proceso', 80000.00);
+
+INSERT IGNORE INTO tareas
+    (id_tarea, id_proyecto, id_responsable, titulo, descripcion,
+     fecha_inicio, fecha_fin, estado)
+VALUES
+    (1, 1, 1, 'Inspeccionar el parque',
+     'Revisar el estado de juegos, bancas y areas verdes.',
+     '2026-07-01', '2026-07-05', 'Finalizada'),
+    (2, 1, 5, 'Comprar materiales',
+     'Cotizar y adquirir pintura, brochas y materiales de limpieza.',
+     '2026-07-06', '2026-07-12', 'Finalizada'),
+    (3, 1, 7, 'Limpiar y pintar',
+     'Realizar la jornada principal de restauracion.',
+     '2026-07-13', '2026-07-25', 'Finalizada'),
+    (4, 1, 1, 'Revisar resultados',
+     'Inspeccion final y cierre de pendientes.',
+     '2026-08-01', '2026-09-30', 'En proceso'),
+
+    (5, 2, 2, 'Definir puntos de recoleccion',
+     'Seleccionar lugares accesibles para los contenedores.',
+     '2026-06-15', '2026-06-25', 'Finalizada'),
+    (6, 2, 6, 'Divulgar la campana',
+     'Preparar material informativo para los vecinos.',
+     '2026-06-26', '2026-10-15', 'En proceso'),
+
+    (7, 3, 3, 'Inspeccionar red electrica',
+     'Identificar puntos que necesitan nuevas luminarias.',
+     '2026-08-01', '2026-08-10', 'Finalizada'),
+    (8, 3, 1, 'Solicitar cotizaciones',
+     'Comparar materiales y servicios de instalacion.',
+     '2026-08-11', '2026-08-25', 'Pendiente'),
+    (9, 3, 7, 'Adquirir luminarias',
+     'Comprar los equipos aprobados por el comite.',
+     '2026-09-01', '2026-09-20', 'Pendiente'),
+    (10, 3, 3, 'Instalar y verificar',
+     'Instalacion, pruebas y cierre del proyecto.',
+     '2026-09-21', '2026-11-30', 'Pendiente'),
+
+    (11, 4, 4, 'Definir contenidos',
+     'Seleccionar los temas principales de la capacitacion.',
+     '2026-07-05', '2026-07-12', 'Finalizada'),
+    (12, 4, 6, 'Preparar materiales',
+     'Crear guias y ejercicios para los participantes.',
+     '2026-07-13', '2026-07-25', 'Finalizada'),
+    (13, 4, 4, 'Abrir inscripciones',
+     'Registrar a las personas interesadas en el taller.',
+     '2026-07-20', '2026-07-31', 'Finalizada'),
+    (14, 4, 6, 'Impartir sesiones',
+     'Desarrollar las sesiones practicas programadas.',
+     '2026-08-01', '2026-08-31', 'En proceso'),
+    (15, 4, 4, 'Evaluar el taller',
+     'Recopilar resultados y recomendaciones.',
+     '2026-09-01', '2026-09-15', 'Pendiente');
+
+INSERT IGNORE INTO actividades
+    (id_actividad, id_comunidad, id_proyecto, id_responsable,
+     titulo, tipo, descripcion, fecha, hora, lugar, estado)
+VALUES
+    (1, 1, NULL, 1, 'Reunion mensual de coordinacion', 'Reunion',
+     'Revision general de proyectos y acuerdos de la comunidad.',
+     '2026-07-12', '18:00:00', 'Salon Comunal', 'Realizada'),
+    (2, 1, 1, 1, 'Limpieza y pintura del parque', 'Jornada',
+     'Jornada voluntaria relacionada con la mejora del parque.',
+     '2026-07-15', '08:00:00', 'Parque Central', 'Realizada'),
+    (3, 1, 2, 2, 'Taller de reciclaje y composta', 'Evento',
+     'Capacitacion sobre separacion de residuos y composta.',
+     '2026-07-18', '17:30:00', 'Salon Comunal', 'Realizada'),
+    (4, 1, 3, 3, 'Inspeccion y trazado electrico', 'Proyecto',
+     'Recorrido tecnico para ubicar las nuevas luminarias.',
+     '2026-08-20', '19:00:00', 'Canchas Deportivas', 'Programada'),
+    (5, 1, 4, 4, 'Sesion practica de tecnologia', 'Evento',
+     'Taller practico para participantes inscritos.',
+     '2026-08-25', '17:30:00', 'Salon Comunal', 'Programada');
+
+INSERT IGNORE INTO actividad_participacion
+    (id_actividad, id_usuario, estado, fecha_registro, observaciones)
+VALUES
+    (1, 1, 'Asistio', '2026-07-10 09:00:00', NULL),
+    (1, 2, 'Asistio', '2026-07-10 09:05:00', NULL),
+    (1, 3, 'Asistio', '2026-07-10 09:10:00', NULL),
+    (1, 4, 'Ausente', '2026-07-10 09:15:00', 'Ausencia justificada'),
+    (2, 1, 'Asistio', '2026-07-13 14:00:00', NULL),
+    (2, 5, 'Asistio', '2026-07-13 14:05:00', NULL),
+    (2, 7, 'Asistio', '2026-07-13 14:10:00', NULL),
+    (3, 2, 'Asistio', '2026-07-16 10:00:00', NULL),
+    (3, 6, 'Asistio', '2026-07-16 10:05:00', NULL),
+    (4, 3, 'Confirmado', '2026-08-01 08:00:00', NULL),
+    (4, 7, 'Confirmado', '2026-08-01 08:05:00', NULL),
+    (5, 4, 'Confirmado', '2026-08-02 11:00:00', NULL),
+    (5, 6, 'Confirmado', '2026-08-02 11:05:00', NULL);
+
+INSERT IGNORE INTO movimientos_financieros
+    (id_movimiento, id_comunidad, id_proyecto, id_usuario,
+     tipo, descripcion, monto, fecha, estado)
+VALUES
+    (1, 1, NULL, 1, 'Ingreso', 'Donacion vecinal',
+     120000.00, '2026-07-01', 'Registrado'),
+    (2, 1, 1, 1, 'Egreso', 'Compra de materiales',
+     45000.00, '2026-07-03', 'Registrado'),
+    (3, 1, NULL, 2, 'Ingreso', 'Actividad comunitaria de recaudacion',
+     85000.00, '2026-07-05', 'Registrado'),
+    (4, 1, 1, 1, 'Egreso', 'Mantenimiento del parque',
+     30000.00, '2026-07-07', 'Registrado'),
+    (5, 1, 2, 2, 'Egreso', 'Contenedores para reciclaje', 
+     25000.00, '2026-07-20', 'Registrado'),
+    (6, 1, 4, 4, 'Ingreso', 'Aporte para capacitaciones',
+     50000.00, '2026-07-25', 'Registrado');
+
+COMMIT;
+
+-- =============================================================
+-- CONSULTAS DE COMPROBACION
+-- Al finalizar la importacion deben aparecer 11 tablas.
+-- =============================================================
+SHOW TABLES;
+
+SELECT
+    COUNT(*) AS total_usuarios
+FROM usuarios;
+
+SELECT
+    COUNT(*) AS total_proyectos
+FROM proyectos;
+
+SELECT
+    tipo,
+    SUM(monto) AS total
+FROM movimientos_financieros
+WHERE estado = 'Registrado'
+GROUP BY tipo;
+
