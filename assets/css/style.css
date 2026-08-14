@@ -240,3 +240,406 @@
         justify-content: center;
     }
 }
+
+/* --------------------------- Vistas de modulos generales --------------------------- */
+
+.modulo-section {
+    background-color: var(--color-fondo);
+    min-height: 100vh;
+}
+
+.modulo-title {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.modulo-text {
+    color: var(--color-texto);
+    margin-bottom: 0;
+}
+
+/* Tarjetas principales de los modulos */
+.modulo-card {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.modulo-card h4 {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+/* Formularios */
+.modulo-card .form-label {
+    color: var(--color-texto);
+    font-weight: 600;
+}
+
+.modulo-card .input-group-text {
+    background-color: var(--color-fondo);
+    color: var(--color-secundario);
+    border-color: var(--color-borde);
+}
+
+.modulo-card .form-control,
+.modulo-card .form-select {
+    border-color: var(--color-borde);
+}
+
+.modulo-card .form-control:focus,
+.modulo-card .form-select:focus {
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.15);
+}
+
+/* Tablas */
+.modulo-table {
+    margin-bottom: 0;
+}
+
+.modulo-table thead th {
+    color: var(--color-principal);
+    font-weight: 800;
+    border-bottom: 1px solid var(--color-borde);
+    white-space: nowrap;
+}
+
+.modulo-table tbody td {
+    color: var(--color-texto);
+    border-bottom: 1px solid var(--color-borde);
+    vertical-align: middle;
+}
+
+.modulo-table tbody tr:hover {
+    background-color: #f8fbf9;
+}
+
+/* Botones pequeños de acciones */
+.modulo-table .btn-sm {
+    border-radius: 10px;
+    margin-right: 4px;
+}
+
+/* Barras de progreso */
+.modulo-table .progress {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    min-width: 90px;
+}
+
+.modulo-table .progress-bar {
+    border-radius: 20px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .modulo-card {
+        padding: 22px;
+    }
+
+    .modulo-title {
+        font-size: 2rem;
+    }
+
+    .modulo-table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .modulo-card {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .modulo-title {
+        font-size: 1.7rem;
+    }
+
+    .btn-lg {
+        width: 100%;
+    }
+}
+
+/* --------------------------- Sesion MVC --------------------------- */
+
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+}
+
+.sin-navegacion .main-content {
+    padding-top: 0;
+}
+
+.btn-usuario {
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 700;
+    max-width: 220px;
+}
+
+.btn-usuario i {
+    font-size: 1.15rem;
+}
+
+.footer-comunigest {
+    background-color: var(--color-principal);
+    color: #dbe7f3;
+}
+
+/* -------------------- Seleccion de comunidad -------------------- */
+
+.comunidades-opciones {
+    display: grid;
+    gap: 12px;
+}
+
+.comunidad-opcion {
+    border: 1px solid var(--color-borde);
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.comunidad-opcion:hover,
+.comunidad-opcion:has(input:checked) {
+    background-color: #e9f5ee;
+    border-color: var(--color-secundario);
+}
+
+.comunidad-opcion span {
+    display: flex;
+    flex-direction: column;
+}
+
+.comunidad-opcion strong {
+    color: var(--color-principal);
+}
+
+.comunidad-opcion small {
+    color: var(--color-gris);
+}
+
+/* --------------------------- Dashboard --------------------------- */
+
+.dashboard-section {
+    background-color: var(--color-fondo);
+    min-height: calc(100vh - 72px);
+}
+
+.dashboard-title {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.dashboard-text {
+    color: var(--color-gris);
+    font-size: 1.05rem;
+    margin-bottom: 0;
+}
+
+.dashboard-card,
+.dashboard-resumen-card {
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-radius: 24px;
+    box-shadow: 0 8px 24px
+        rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-card {
+    padding: 28px;
+}
+
+.dashboard-card h4 {
+    color: var(--color-principal);
+    font-weight: 800;
+}
+
+.dashboard-resumen-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+}
+
+.dashboard-resumen-icono,
+.dashboard-lista-icono {
+    background-color: #e9f5ee;
+    color: var(--color-secundario);
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+}
+
+.dashboard-resumen-icono {
+    border-radius: 18px;
+    font-size: 1.6rem;
+    height: 58px;
+    width: 58px;
+}
+
+.dashboard-resumen-card h3 {
+    color: var(--color-principal);
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+
+.dashboard-resumen-card h6 {
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.dashboard-resumen-card p,
+.dashboard-lista-item p,
+.dashboard-movimiento p {
+    color: var(--color-gris);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* ----------------------- Tabla del dashboard ----------------------- */
+
+.dashboard-table {
+    margin-bottom: 0;
+}
+
+.dashboard-table thead th {
+    color: var(--color-principal);
+    white-space: nowrap;
+}
+
+.dashboard-table .progress {
+    height: 9px;
+    min-width: 90px;
+}
+
+/* ---------------------- Listas del dashboard ---------------------- */
+
+.dashboard-lista {
+    display: grid;
+    gap: 14px;
+}
+
+.dashboard-lista-item,
+.dashboard-movimiento {
+    border-bottom: 1px solid var(--color-borde);
+    padding-bottom: 14px;
+}
+
+.dashboard-lista-item:last-child,
+.dashboard-movimiento:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.dashboard-lista-item {
+    display: flex;
+    gap: 12px;
+}
+
+.dashboard-lista-icono {
+    border-radius: 12px;
+    height: 42px;
+    width: 42px;
+}
+
+.dashboard-lista-item h6,
+.dashboard-movimiento h6 {
+    margin-bottom: 3px;
+}
+
+/* ------------------- Movimientos financieros ------------------- */
+
+.dashboard-movimiento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.movimiento-ingreso,
+.movimiento-egreso {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.movimiento-ingreso {
+    color: var(--color-exito);
+}
+
+.movimiento-egreso {
+    color: var(--color-error);
+}
+
+/* ----------------------- Accesos rapidos ----------------------- */
+
+.dashboard-accesos {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dashboard-accesos a {
+    background-color: var(--color-fondo);
+    border: 1px solid var(--color-borde);
+    border-radius: 14px;
+    color: var(--color-principal);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 14px;
+    text-decoration: none;
+    font-weight: 700;
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.dashboard-accesos a:hover {
+    border-color: var(--color-secundario);
+    color: var(--color-secundario);
+}
+
+/* --------------------------- Responsive --------------------------- */
+
+@media (max-width: 991px) {
+    .btn-usuario {
+        justify-content: center;
+        margin-top: 12px;
+        max-width: none;
+        width: 100%;
+    }
+}
+
+@media (max-width: 575px) {
+    .dashboard-card,
+    .dashboard-resumen-card {
+        border-radius: 18px;
+    }
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+    .dashboard-accesos {
+        grid-template-columns: 1fr;
+    }
+}
