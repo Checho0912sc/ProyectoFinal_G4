@@ -115,6 +115,35 @@ $rutas = [
             'index',
         ],
     ],
+
+    'actividades' => [
+        'index' => [
+            ActividadController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            ActividadController::class,
+            'guardar',
+        ],
+    ],
+
+    'grupos' => [
+        'index' => [
+            GrupoController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            GrupoController::class,
+            'guardar',
+        ],
+
+        'asociar' => [
+            GrupoController::class,
+            'asociar',
+        ],
+    ],
 ];
 
 if (
