@@ -43,12 +43,12 @@ $accesos = [
     ],
     [
         'nombre' => 'Actividades',
-        'ruta' => 'actividades.html',
+        'ruta' => 'index.php?controller=actividades&action=index',
         'icono' => 'bi-calendar-check',
     ],
     [
         'nombre' => 'Grupos',
-        'ruta' => 'grupos.html',
+        'ruta' => 'index.php?controller=grupos&action=index',
         'icono' => 'bi-person-workspace',
     ],
     [

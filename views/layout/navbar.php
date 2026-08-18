@@ -115,9 +115,31 @@ $usuarioNavegacion = Auth::usuario();
 
                     </li>
 
-                    <li
-                        class="nav-item dropdown ms-lg-2"
-                    >
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="<?= e(url('index.php?controller=actividades&action=index')) ?>"
+                        >
+                            <i class="bi bi-calendar-event"></i>
+                            Actividades
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="<?= e(url('index.php?controller=grupos&action=index')) ?>"
+                        >
+                            <i class="bi bi-person-workspace"></i>
+                            Grupos
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item dropdown ms-lg-2">
 
                         <button
                             class="btn btn-outline-success
