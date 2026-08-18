@@ -79,6 +79,33 @@ $metodo = strtoupper(
     $_SERVER['REQUEST_METHOD'] ?? 'GET'
 );
 
+$metodosEscritura = [
+    'POST',
+    'PUT',
+    'DELETE',
+];
+
+if (
+    in_array(
+        $metodo,
+        $metodosEscritura,
+        true
+    )
+    && !Auth::tieneRol(
+        'Administrador',
+        'Coordinador'
+    )
+) {
+    responderProyectoJson(
+        [
+            'exito' => false,
+            'mensaje' =>
+                'No tienes permisos para gestionar proyectos.',
+        ],
+        403
+    );
+}
+
 $idProyecto = filter_input(
     INPUT_GET,
     'id',

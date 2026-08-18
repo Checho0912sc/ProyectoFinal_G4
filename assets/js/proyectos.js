@@ -5,8 +5,16 @@ $(function () {
     const apiUrl = $config.data("api-url");
     const csrfToken = $config.data("csrf-token");
 
-    cargarGrupos();
-    cargarResponsables();
+    const puedeGestionar =
+        Number(
+            $config.data("puede-gestionar")
+        ) === 1;
+
+    if (puedeGestionar) {
+        cargarGrupos();
+        cargarResponsables();
+    }
+
     cargarProyectos();
 
 
@@ -145,7 +153,10 @@ $(function () {
             $("<tr>")
                 .append(
                     $("<td>")
-                        .attr("colspan", 7)
+                        .attr(
+                            "colspan",
+                            puedeGestionar ? 7 : 6
+                        )
                         .addClass(
                             "text-center text-muted py-4"
                         )
@@ -207,58 +218,59 @@ $(function () {
                 .appendTo($fila);
 
 
-            const $acciones = $("<td>");
+  if (puedeGestionar) {
 
+    const $acciones = $("<td>");
 
-            $("<button>")
-                .attr("type", "button")
-                .addClass(
-                    "btn btn-sm btn-outline-primary me-2 btn-editar-proyecto"
-                )
-                .data(
-                    "id",
-                    proyecto.id_proyecto
-                )
-                .attr(
-                    "title",
-                    "Editar"
-                )
-                .html(
-                    '<i class="bi bi-pencil"></i>'
-                )
-                .appendTo($acciones);
-
-
-            if (proyecto.estado !== "Cancelado") {
-
-                $("<button>")
-                    .attr("type", "button")
-                    .addClass(
-                        "btn btn-sm btn-outline-danger btn-eliminar-proyecto"
-                    )
-                    .data(
-                        "id",
-                        proyecto.id_proyecto
-                    )
+    $("<button>")
+        .attr("type", "button")
+        .addClass(
+            "btn btn-sm btn-outline-primary me-2 btn-editar-proyecto"
+        )
+        .data(
+            "id",
+            proyecto.id_proyecto
+        )
                     .attr(
                         "title",
-                        "Cancelar proyecto"
+                        "Editar"
                     )
                     .html(
-                        '<i class="bi bi-x-circle"></i>'
+                        '<i class="bi bi-pencil"></i>'
                     )
                     .appendTo($acciones);
 
+                if (proyecto.estado !== "Cancelado") {
+
+                    $("<button>")
+                        .attr("type", "button")
+                        .addClass(
+                            "btn btn-sm btn-outline-danger btn-eliminar-proyecto"
+                        )
+                        .data(
+                            "id",
+                            proyecto.id_proyecto
+                        )
+                        .attr(
+                            "title",
+                            "Cancelar proyecto"
+                        )
+                        .html(
+                            '<i class="bi bi-x-circle"></i>'
+                        )
+                        .appendTo($acciones);
+
+                }
+
+                $acciones.appendTo($fila);
+
             }
-
-
-            $acciones.appendTo($fila);
 
             $fila.appendTo($tabla);
 
         });
 
-    }
+}
 
 
     // ==========================================

@@ -278,6 +278,9 @@ $(function () {
                         $acciones
                     );
 
+                const usuarioActivo =
+                    usuario.estado === "Activo";
+
                 $("<button>")
                     .attr(
                         "type",
@@ -292,10 +295,22 @@ $(function () {
                     )
                     .attr(
                         "title",
-                        "Desactivar"
+                        usuarioActivo
+                            ? "Desactivar usuario"
+                            : "Usuario inactivo"
+                    )
+                    .attr(
+                        "aria-label",
+                        usuarioActivo
+                            ? "Desactivar usuario"
+                            : "Usuario inactivo"
+                    )
+                    .prop(
+                        "disabled",
+                        !usuarioActivo
                     )
                     .html(
-                        '<i class="bi bi-trash"></i>'
+                        '<i class="bi bi-person-dash"></i>'
                     )
                     .appendTo(
                         $acciones
@@ -378,24 +393,31 @@ $(function () {
                 $("#contrasena")
                     .val("");
 
+                $(
+                    "#nombre, #correo, #telefono, #contrasena"
+                ).prop(
+                    "disabled",
+                    true
+                );
+
                 $("#tituloFormulario")
                     .text(
-                        "Editar usuario"
+                        "Editar membresía"
                     );
 
                 $("#textoFormulario")
                     .text(
-                        "Modifique los datos del miembro seleccionado."
+                        "Modifique el rol y el estado del usuario en esta comunidad."
                     );
 
                 $("#ayudaContrasena")
                     .text(
-                        "Déjela vacía si no desea cambiar la contraseña."
+                        "Los datos de la cuenta no se modifican desde este módulo."
                     );
 
                 $("#btnGuardarUsuario")
                     .html(
-                        '<i class="bi bi-save"></i> Actualizar usuario'
+                        '<i class="bi bi-save"></i> Actualizar membresía'
                     );
 
                 $("#btnCancelarEdicion")
@@ -433,40 +455,49 @@ $(function () {
         const idUsuario =
             $("#idUsuario").val();
 
-        const datos = {
-
-            nombre:
-                $("#nombre")
-                    .val()
-                    .trim(),
-
-            correo:
-                $("#correo")
-                    .val()
-                    .trim(),
-
-            telefono:
-                $("#telefono")
-                    .val()
-                    .trim(),
-
-            contrasena:
-                $("#contrasena")
-                    .val(),
-
-            id_rol:
-                parseInt(
-                    $("#idRol").val(),
-                    10
-                ),
-
-            estado:
-                $("#estado").val()
-
-        };
-
         const esEdicion =
             idUsuario !== "";
+
+        const datos = esEdicion
+            ? {
+                id_rol:
+                    parseInt(
+                        $("#idRol").val(),
+                        10
+                    ),
+
+                estado:
+                    $("#estado").val()
+            }
+            : {
+                nombre:
+                    $("#nombre")
+                        .val()
+                        .trim(),
+
+                correo:
+                    $("#correo")
+                        .val()
+                        .trim(),
+
+                telefono:
+                    $("#telefono")
+                        .val()
+                        .trim(),
+
+                contrasena:
+                    $("#contrasena")
+                        .val(),
+
+                id_rol:
+                    parseInt(
+                        $("#idRol").val(),
+                        10
+                    ),
+
+                estado:
+                    $("#estado").val()
+            };
 
         const url =
             esEdicion
@@ -738,6 +769,13 @@ $(function () {
 
         $("#idUsuario")
             .val("");
+
+        $(
+            "#nombre, #correo, #telefono, #contrasena"
+        ).prop(
+            "disabled",
+            false
+        );
 
         $("#estado")
             .val("Activo");

@@ -1,5 +1,13 @@
 <main class="main-content">
 
+    <?php
+    $puedeGestionarProyectos = Auth::tieneRol(
+        'Administrador',
+        'Coordinador'
+    );
+
+    ?>
+
     <section class="modulo-section py-5">
 
         <div class="container">
@@ -9,7 +17,9 @@
                 id="configProyectos"
                 data-api-url="<?= e(url('api/proyectos.php')) ?>"
                 data-csrf-token="<?= e(Auth::csrfToken()) ?>"
-            ></div>
+                data-puede-gestionar="<?= $puedeGestionarProyectos ? '1' : '0' ?>"
+            >
+            </div>
 
             <!-- Mensajes de éxito o error -->
             <div id="mensajeProyectos"></div>
@@ -34,287 +44,289 @@
 
                 </div>
 
-                <div class="col-12 col-lg-4 text-lg-end mt-3 mt-lg-0">
-
-                    <button
-                        type="button"
-                        id="btnNuevoProyecto"
-                        class="btn btn-success btn-lg"
-                    >
-                        <i class="bi bi-folder-plus"></i>
-                        Nuevo proyecto
-                    </button>
-
-                </div>
+                
+                <?php if ($puedeGestionarProyectos): ?>
+                    <div class="col-12 col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <button
+                            type="button"
+                            id="btnNuevoProyecto"
+                            class="btn btn-success btn-lg"
+                        >
+                            <i class="bi bi-folder-plus"></i>
+                            Nuevo proyecto
+                        </button>
+                    </div>
+                <?php endif; ?>
 
             </div>
 
             <div class="row g-4">
 
                 <!-- FORMULARIO -->
-                <div class="col-12 col-xl-4">
+                <?php if ($puedeGestionarProyectos): ?>
+                    <div class="col-12 col-xl-4">
+                        <div class="modulo-card h-100">
 
-                    <div class="modulo-card h-100">
+                            <h4 id="tituloFormularioProyecto">
+                                Registrar proyecto
+                            </h4>
 
-                        <h4 id="tituloFormularioProyecto">
-                            Registrar proyecto
-                        </h4>
-
-                        <p
-                            id="textoFormularioProyecto"
-                            class="text-muted"
-                        >
-                            Complete la información del proyecto.
-                        </p>
-
-                        <form id="formProyecto" novalidate>
-
-                            <input
-                                type="hidden"
-                                id="idProyecto"
-                                value=""
+                            <p
+                                id="textoFormularioProyecto"
+                                class="text-muted"
                             >
+                                Complete la información del proyecto.
+                            </p>
 
-                            <!-- Nombre -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="nombreProyecto"
-                                    class="form-label"
-                                >
-                                    Nombre
-                                </label>
+                            <form id="formProyecto" novalidate>
 
                                 <input
-                                    type="text"
-                                    id="nombreProyecto"
-                                    class="form-control"
-                                    maxlength="150"
-                                    placeholder="Ej: Parque comunitario"
+                                    type="hidden"
+                                    id="idProyecto"
+                                    value=""
                                 >
 
-                                <div
-                                    id="errorNombreProyecto"
-                                    class="text-danger small mt-1"
-                                ></div>
+                                <!-- Nombre -->
+                                <div class="mb-3">
 
-                            </div>
-
-                            <!-- Grupo -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="idGrupo"
-                                    class="form-label"
-                                >
-                                    Grupo
-                                </label>
-
-                                <select
-                                    id="idGrupo"
-                                    class="form-select"
-                                >
-                                    <option value="">
-                                        Seleccione un grupo
-                                    </option>
-                                </select>
-
-                                <div
-                                    id="errorGrupo"
-                                    class="text-danger small mt-1"
-                                ></div>
-
-                            </div>
-
-                            <!-- Responsable -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="idResponsable"
-                                    class="form-label"
-                                >
-                                    Responsable
-                                </label>
-
-                                <select
-                                    id="idResponsable"
-                                    class="form-select"
-                                >
-                                    <option value="">
-                                        Seleccione un responsable
-                                    </option>
-                                </select>
-
-                                <div
-                                    id="errorResponsable"
-                                    class="text-danger small mt-1"
-                                ></div>
-
-                            </div>
-
-                            <!-- Descripción -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="descripcionProyecto"
-                                    class="form-label"
-                                >
-                                    Descripción
-                                </label>
-
-                                <textarea
-                                    id="descripcionProyecto"
-                                    class="form-control"
-                                    rows="3"
-                                    placeholder="Descripción del proyecto"
-                                ></textarea>
-
-                            </div>
-
-                            <!-- Fecha inicio -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="fechaInicio"
-                                    class="form-label"
-                                >
-                                    Fecha de inicio
-                                </label>
-
-                                <input
-                                    type="date"
-                                    id="fechaInicio"
-                                    class="form-control"
-                                >
-
-                                <div
-                                    id="errorFechaInicio"
-                                    class="text-danger small mt-1"
-                                ></div>
-
-                            </div>
-
-                            <!-- Fecha fin -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="fechaFin"
-                                    class="form-label"
-                                >
-                                    Fecha de finalización
-                                </label>
-
-                                <input
-                                    type="date"
-                                    id="fechaFin"
-                                    class="form-control"
-                                >
-
-                                <div
-                                    id="errorFechaFin"
-                                    class="text-danger small mt-1"
-                                ></div>
-
-                            </div>
-
-                            <!-- Estado -->
-                            <div class="mb-3">
-
-                                <label
-                                    for="estadoProyecto"
-                                    class="form-label"
-                                >
-                                    Estado
-                                </label>
-
-                                <select
-                                    id="estadoProyecto"
-                                    class="form-select"
-                                >
-                                    <option value="Planificado">
-                                        Planificado
-                                    </option>
-
-                                    <option value="En proceso">
-                                        En proceso
-                                    </option>
-
-                                    <option value="Pausado">
-                                        Pausado
-                                    </option>
-
-                                    <option value="Finalizado">
-                                        Finalizado
-                                    </option>
-
-                                    <option value="Cancelado">
-                                        Cancelado
-                                    </option>
-                                </select>
-
-                            </div>
-
-                            <!-- Presupuesto -->
-                            <div class="mb-4">
-
-                                <label
-                                    for="presupuesto"
-                                    class="form-label"
-                                >
-                                    Presupuesto
-                                </label>
-
-                                <div class="input-group">
-
-                                    <span class="input-group-text">
-                                        ₡
-                                    </span>
+                                    <label
+                                        for="nombreProyecto"
+                                        class="form-label"
+                                    >
+                                        Nombre
+                                    </label>
 
                                     <input
-                                        type="number"
-                                        id="presupuesto"
+                                        type="text"
+                                        id="nombreProyecto"
                                         class="form-control"
-                                        min="0"
-                                        step="0.01"
-                                        value="0"
+                                        maxlength="150"
+                                        placeholder="Ej: Parque comunitario"
                                     >
+
+                                    <div
+                                        id="errorNombreProyecto"
+                                        class="text-danger small mt-1"
+                                    ></div>
 
                                 </div>
 
-                                <div
-                                    id="errorPresupuesto"
-                                    class="text-danger small mt-1"
-                                ></div>
+                                <!-- Grupo -->
+                                <div class="mb-3">
 
-                            </div>
+                                    <label
+                                        for="idGrupo"
+                                        class="form-label"
+                                    >
+                                        Grupo
+                                    </label>
 
-                            <!-- Guardar -->
-                            <button
-                                type="submit"
-                                id="btnGuardarProyecto"
-                                class="btn btn-success w-100"
-                            >
-                                <i class="bi bi-save"></i>
-                                Guardar proyecto
-                            </button>
+                                    <select
+                                        id="idGrupo"
+                                        class="form-select"
+                                    >
+                                        <option value="">
+                                            Seleccione un grupo
+                                        </option>
+                                    </select>
 
-                            <!-- Cancelar edición -->
-                            <button
-                                type="button"
-                                id="btnCancelarEdicionProyecto"
-                                class="btn btn-outline-secondary w-100 mt-2 d-none"
-                            >
-                                Cancelar edición
-                            </button>
+                                    <div
+                                        id="errorGrupo"
+                                        class="text-danger small mt-1"
+                                    ></div>
 
-                        </form>
+                                </div>
+
+                                <!-- Responsable -->
+                                <div class="mb-3">
+
+                                    <label
+                                        for="idResponsable"
+                                        class="form-label"
+                                    >
+                                        Responsable
+                                    </label>
+
+                                    <select
+                                        id="idResponsable"
+                                        class="form-select"
+                                    >
+                                        <option value="">
+                                            Seleccione un responsable
+                                        </option>
+                                    </select>
+
+                                    <div
+                                        id="errorResponsable"
+                                        class="text-danger small mt-1"
+                                    ></div>
+
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="mb-3">
+
+                                    <label
+                                        for="descripcionProyecto"
+                                        class="form-label"
+                                    >
+                                        Descripción
+                                    </label>
+
+                                    <textarea
+                                        id="descripcionProyecto"
+                                        class="form-control"
+                                        rows="3"
+                                        placeholder="Descripción del proyecto"
+                                    ></textarea>
+
+                                </div>
+
+                                <!-- Fecha inicio -->
+                                <div class="mb-3">
+
+                                    <label
+                                        for="fechaInicio"
+                                        class="form-label"
+                                    >
+                                        Fecha de inicio
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        id="fechaInicio"
+                                        class="form-control"
+                                    >
+
+                                    <div
+                                        id="errorFechaInicio"
+                                        class="text-danger small mt-1"
+                                    ></div>
+
+                                </div>
+
+                                <!-- Fecha fin -->
+                                <div class="mb-3">
+
+                                    <label
+                                        for="fechaFin"
+                                        class="form-label"
+                                    >
+                                        Fecha de finalización
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        id="fechaFin"
+                                        class="form-control"
+                                    >
+
+                                    <div
+                                        id="errorFechaFin"
+                                        class="text-danger small mt-1"
+                                    ></div>
+
+                                </div>
+
+                                <!-- Estado -->
+                                <div class="mb-3">
+
+                                    <label
+                                        for="estadoProyecto"
+                                        class="form-label"
+                                    >
+                                        Estado
+                                    </label>
+
+                                    <select
+                                        id="estadoProyecto"
+                                        class="form-select"
+                                    >
+                                        <option value="Planificado">
+                                            Planificado
+                                        </option>
+
+                                        <option value="En proceso">
+                                            En proceso
+                                        </option>
+
+                                        <option value="Pausado">
+                                            Pausado
+                                        </option>
+
+                                        <option value="Finalizado">
+                                            Finalizado
+                                        </option>
+
+                                        <option value="Cancelado">
+                                            Cancelado
+                                        </option>
+                                    </select>
+
+                                </div>
+
+                                <!-- Presupuesto -->
+                                <div class="mb-4">
+
+                                    <label
+                                        for="presupuesto"
+                                        class="form-label"
+                                    >
+                                        Presupuesto
+                                    </label>
+
+                                    <div class="input-group">
+
+                                        <span class="input-group-text">
+                                            ₡
+                                        </span>
+
+                                        <input
+                                            type="number"
+                                            id="presupuesto"
+                                            class="form-control"
+                                            min="0"
+                                            step="0.01"
+                                            value="0"
+                                        >
+
+                                    </div>
+
+                                    <div
+                                        id="errorPresupuesto"
+                                        class="text-danger small mt-1"
+                                    ></div>
+
+                                </div>
+
+                                <!-- Guardar -->
+                                <button
+                                    type="submit"
+                                    id="btnGuardarProyecto"
+                                    class="btn btn-success w-100"
+                                >
+                                    <i class="bi bi-save"></i>
+                                    Guardar proyecto
+                                </button>
+
+                                <!-- Cancelar edición -->
+                                <button
+                                    type="button"
+                                    id="btnCancelarEdicionProyecto"
+                                    class="btn btn-outline-secondary w-100 mt-2 d-none"
+                                >
+                                    Cancelar edición
+                                </button>
+
+                            </form>
+
+                        </div>
 
                     </div>
-
-                </div>
+                <?php endif; ?>
 
                 <!-- TABLA -->
-                <div class="col-12 col-xl-8">
+                <div class="col-12 <?= $puedeGestionarProyectos ? 'col-xl-8' : '' ?>">
 
                     <div class="modulo-card">
 
@@ -371,7 +383,9 @@
                                         <th>Inicio</th>
                                         <th>Presupuesto</th>
                                         <th>Estado</th>
-                                        <th>Acciones</th>
+                                        <?php if ($puedeGestionarProyectos): ?>
+                                            <th>Acciones</th>
+                                        <?php endif; ?>
                                     </tr>
 
                                 </thead>
@@ -381,11 +395,9 @@
                                     <tr>
 
                                         <td
-                                            colspan="7"
+                                            colspan="<?= $puedeGestionarProyectos ? '7' : '6' ?>"
                                             class="text-center text-muted py-4"
-                                        >
-                                            Cargando proyectos...
-                                        </td>
+                                        >   
 
                                     </tr>
 

@@ -101,37 +101,19 @@ final class UsuarioService
         array $datos,
         int $idComunidad
     ): void {
-        $usuarioActual = $this->obtener(
+        $this->obtener(
             $idUsuario,
             $idComunidad
         );
 
-        if ($usuarioActual === []) {
-            throw new RuntimeException(
-                'No fue posible localizar el usuario.'
+        $datosMembresia =
+            $this->validarMembresia(
+                $datos
             );
-        }
-
-        $datosLimpios =
-            $this->validarDatos(
-                $datos,
-                false
-            );
-
-        if (
-            $this->usuarioRepository->existeCorreo(
-                $datosLimpios['correo'],
-                $idUsuario
-            )
-        ) {
-            throw new InvalidArgumentException(
-                'Ya existe otro usuario con ese correo.'
-            );
-        }
 
         if (
             !$this->usuarioRepository->existeRolActivo(
-                $datosLimpios['id_rol']
+                $datosMembresia['id_rol']
             )
         ) {
             throw new InvalidArgumentException(
@@ -139,24 +121,12 @@ final class UsuarioService
             );
         }
 
-        if ($datosLimpios['contrasena'] !== '') {
-            $datosLimpios['contrasena_hash'] =
-                password_hash(
-                    $datosLimpios['contrasena'],
-                    PASSWORD_DEFAULT
-                );
-        } else {
-            $datosLimpios['contrasena_hash'] = null;
-        }
-
-        unset($datosLimpios['contrasena']);
-
         $this
             ->usuarioRepository
             ->actualizar(
                 $idUsuario,
                 $idComunidad,
-                $datosLimpios
+                $datosMembresia
             );
     }
 
@@ -182,6 +152,46 @@ final class UsuarioService
                 $idUsuario,
                 $idComunidad
             );
+    }
+
+    private function validarMembresia(
+        array $datos
+    ): array {
+        $idRol = filter_var(
+            $datos['id_rol'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        $estado = trim(
+            (string) ($datos['estado'] ?? '')
+        );
+
+        if (
+            $idRol === false
+            || $idRol === null
+            || $idRol <= 0
+        ) {
+            throw new InvalidArgumentException(
+                'Debes seleccionar un rol válido.'
+            );
+        }
+
+        if (
+            !in_array(
+                $estado,
+                ['Activo', 'Inactivo'],
+                true
+            )
+        ) {
+            throw new InvalidArgumentException(
+                'El estado seleccionado no es válido.'
+            );
+        }
+
+        return [
+            'id_rol' => (int) $idRol,
+            'estado' => $estado,
+        ];
     }
 
     private function validarDatos(

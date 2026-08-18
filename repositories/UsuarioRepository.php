@@ -312,88 +312,29 @@ final class UsuarioRepository
     }
 
     public function actualizar(
-        int $idUsuario,
-        int $idComunidad,
-        array $datos
-    ): void {
-        try {
-            $this->conexion->beginTransaction();
+    int $idUsuario,
+    int $idComunidad,
+    array $datos
+): void {
+    $sql = <<<'SQL'
+        UPDATE usuario_comunidad
+        SET
+            id_rol = :id_rol,
+            estado = :estado
+        WHERE id_usuario = :id_usuario
+          AND id_comunidad = :id_comunidad
+    SQL;
 
-            if (
-                isset($datos['contrasena_hash'])
-                && $datos['contrasena_hash'] !== null
-            ) {
-                $sqlUsuario = <<<'SQL'
-                    UPDATE usuarios
-                    SET
-                        nombre = :nombre,
-                        correo = :correo,
-                        telefono = :telefono,
-                        contrasena_hash = :contrasena_hash
-                    WHERE id_usuario = :id_usuario
-                SQL;
+    $consulta =
+        $this->conexion->prepare($sql);
 
-                $parametrosUsuario = [
-                    'nombre' => $datos['nombre'],
-                    'correo' => $datos['correo'],
-                    'telefono' => $datos['telefono'],
-                    'contrasena_hash' =>
-                        $datos['contrasena_hash'],
-                    'id_usuario' => $idUsuario,
-                ];
-            } else {
-                $sqlUsuario = <<<'SQL'
-                    UPDATE usuarios
-                    SET
-                        nombre = :nombre,
-                        correo = :correo,
-                        telefono = :telefono
-                    WHERE id_usuario = :id_usuario
-                SQL;
-
-                $parametrosUsuario = [
-                    'nombre' => $datos['nombre'],
-                    'correo' => $datos['correo'],
-                    'telefono' => $datos['telefono'],
-                    'id_usuario' => $idUsuario,
-                ];
-            }
-
-            $consultaUsuario =
-                $this->conexion->prepare($sqlUsuario);
-
-            $consultaUsuario->execute(
-                $parametrosUsuario
-            );
-
-            $sqlComunidad = <<<'SQL'
-                UPDATE usuario_comunidad
-                SET
-                    id_rol = :id_rol,
-                    estado = :estado
-                WHERE id_usuario = :id_usuario
-                  AND id_comunidad = :id_comunidad
-            SQL;
-
-            $consultaComunidad =
-                $this->conexion->prepare($sqlComunidad);
-
-            $consultaComunidad->execute([
-                'id_rol' => $datos['id_rol'],
-                'estado' => $datos['estado'],
-                'id_usuario' => $idUsuario,
-                'id_comunidad' => $idComunidad,
-            ]);
-
-            $this->conexion->commit();
-        } catch (Throwable $error) {
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
-
-            throw $error;
-        }
-    }
+    $consulta->execute([
+        'id_rol' => $datos['id_rol'],
+        'estado' => $datos['estado'],
+        'id_usuario' => $idUsuario,
+        'id_comunidad' => $idComunidad,
+    ]);
+}
 
     public function desactivarEnComunidad(
         int $idUsuario,
