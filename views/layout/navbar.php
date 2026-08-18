@@ -5,6 +5,7 @@ $usuarioNavegacion = Auth::usuario();
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+
     <div class="container">
 
         <a
@@ -34,6 +35,7 @@ $usuarioNavegacion = Auth::usuario();
             id="menuPrincipal"
             aria-labelledby="menuPrincipalLabel"
         >
+
             <div class="offcanvas-header">
 
                 <h5
@@ -60,6 +62,7 @@ $usuarioNavegacion = Auth::usuario();
                     class="navbar-nav ms-auto
                     align-items-lg-center gap-lg-1"
                 >
+
                     <li class="nav-item">
 
                         <a
@@ -76,14 +79,19 @@ $usuarioNavegacion = Auth::usuario();
                     </li>
 
                     <?php if (
-                        Auth::tieneRol('Administrador')
+                        Auth::tieneRol(
+                            'Administrador'
+                        )
                     ): ?>
 
                         <li class="nav-item">
 
                             <a
                                 class="nav-link"
-                                href="<?= e(url('usuario.html')) ?>"
+                                href="<?= e(url(
+                                    'index.php?controller=usuario'
+                                    . '&action=index'
+                                )) ?>"
                             >
                                 <i class="bi bi-people"></i>
                                 Usuarios
@@ -95,13 +103,15 @@ $usuarioNavegacion = Auth::usuario();
 
                     <li class="nav-item">
 
-                        <a
-                            class="nav-link"
-                            href="<?= e(url('proyecto.html')) ?>"
-                        >
-                            <i class="bi bi-folder-check"></i>
-                            Proyectos
-                        </a>
+                    <a
+                        class="nav-link"
+                        href="<?= e(url(
+                            'index.php?controller=proyecto&action=index'
+                        )) ?>"
+                    >
+                        <i class="bi bi-folder-check"></i>
+                        Proyectos
+                    </a>
 
                     </li>
 
@@ -138,11 +148,14 @@ $usuarioNavegacion = Auth::usuario();
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
                         >
-                            <i class="bi bi-person-circle"></i>
+                            <i
+                                class="bi bi-person-circle"
+                            ></i>
 
                             <?= e(
-                                $usuarioNavegacion['nombre']
-                                ?? 'Cuenta'
+                                $usuarioNavegacion[
+                                    'nombre'
+                                ] ?? 'Cuenta'
                             ) ?>
                         </button>
 
@@ -150,13 +163,18 @@ $usuarioNavegacion = Auth::usuario();
                             class="dropdown-menu
                             dropdown-menu-end shadow-sm"
                         >
+
                             <li>
-                                <div class="dropdown-item-text">
+
+                                <div
+                                    class="dropdown-item-text"
+                                >
 
                                     <strong>
                                         <?= e(
-                                            $usuarioNavegacion['rol']
-                                            ?? ''
+                                            $usuarioNavegacion[
+                                                'rol'
+                                            ] ?? ''
                                         ) ?>
                                     </strong>
 
@@ -171,10 +189,13 @@ $usuarioNavegacion = Auth::usuario();
                                     </small>
 
                                 </div>
+
                             </li>
 
                             <li>
-                                <hr class="dropdown-divider">
+                                <hr
+                                    class="dropdown-divider"
+                                >
                             </li>
 
                             <li>
@@ -186,6 +207,7 @@ $usuarioNavegacion = Auth::usuario();
                                     )) ?>"
                                     method="post"
                                 >
+
                                     <input
                                         type="hidden"
                                         name="csrf_token"
@@ -206,16 +228,21 @@ $usuarioNavegacion = Auth::usuario();
 
                                         Cerrar sesión
                                     </button>
+
                                 </form>
 
                             </li>
+
                         </ul>
 
                     </li>
+
                 </ul>
 
             </div>
+
         </div>
 
     </div>
+
 </nav>
