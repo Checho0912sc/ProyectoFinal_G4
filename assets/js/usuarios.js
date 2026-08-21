@@ -8,135 +8,56 @@ $(function () {
     const csrfToken =
         $config.data("csrf-token");
 
+    const idUsuarioActual = Number(
+        $config.data("id-usuario-actual")
+    );
+
     cargarRoles();
     cargarUsuarios();
 
-    $("#formUsuario").on(
-        "submit",
-        function (evento) {
+    $("#formUsuario").on("submit", function (evento) {
+        evento.preventDefault();
+        guardarMembresia();
+    });
 
-            evento.preventDefault();
+    $("#btnCancelarEdicion").on("click", function () {
+        limpiarSeleccion();
+    });
 
-            guardarUsuario();
-
-        }
-    );
-
-    $("#btnNuevoUsuario").on(
-        "click",
-        function () {
-
-            limpiarFormulario();
-
-            $("#nombre").trigger("focus");
-
-        }
-    );
-
-    $("#btnCancelarEdicion").on(
-        "click",
-        function () {
-
-            limpiarFormulario();
-
-        }
-    );
-
-    $("#buscarUsuario").on(
-        "keyup",
-        function () {
-
-            const texto =
-                $(this)
-                    .val()
-                    .toLowerCase()
-                    .trim();
-
-            $("#tablaUsuarios tr").each(
-                function () {
-
-                    const contenido =
-                        $(this)
-                            .text()
-                            .toLowerCase();
-
-                    $(this).toggle(
-                        contenido.includes(texto)
-                    );
-
-                }
-            );
-
-        }
-    );
+    $("#buscarUsuario").on("input", function () {
+        filtrarUsuarios();
+    });
 
     $("#tablaUsuarios").on(
         "click",
         ".btn-editar",
         function () {
-
-            const idUsuario =
-                $(this).data("id");
+            const idUsuario = Number(
+                $(this).data("id")
+            );
 
             cargarUsuario(idUsuario);
-
         }
     );
 
     $("#tablaUsuarios").on(
         "click",
-        ".btn-eliminar",
+        ".btn-desactivar",
         function () {
+            const idUsuario = Number(
+                $(this).data("id")
+            );
 
-            const idUsuario =
-                $(this).data("id");
-
-            eliminarUsuario(idUsuario);
-
+            desactivarUsuario(idUsuario);
         }
     );
 
-    function cargarUsuarios() {
 
-        $.ajax({
-
-            url: apiUrl,
-            method: "GET",
-            dataType: "json",
-
-            success: function (respuesta) {
-
-                if (!respuesta.exito) {
-
-                    mostrarMensaje(
-                        respuesta.mensaje
-                        || "No fue posible cargar los usuarios.",
-                        "danger"
-                    );
-
-                    return;
-                }
-
-                mostrarUsuarios(
-                    respuesta.usuarios
-                );
-
-            },
-
-            error: function (xhr) {
-
-                mostrarErrorAjax(xhr);
-
-            }
-
-        });
-
-    }
+    // ------------------ CARGAR ROLES (Llena el select con los roles disponibles) ------------------
 
     function cargarRoles() {
 
         $.ajax({
-
             url: apiUrl,
             method: "GET",
 
@@ -149,47 +70,84 @@ $(function () {
             success: function (respuesta) {
 
                 if (!respuesta.exito) {
+                    mostrarMensaje(
+                        "danger",
+                        respuesta.mensaje
+                    );
+
                     return;
                 }
 
-                const $select =
-                    $("#idRol");
+                const $select = $("#idRol");
 
                 $select
-                    .find(
-                        "option:not(:first)"
-                    )
+                    .find("option:not(:first)")
                     .remove();
 
-                respuesta.roles.forEach(
-                    function (rol) {
+                respuesta.roles.forEach(function (rol) {
 
-                        $("<option>")
-                            .val(rol.id_rol)
-                            .text(rol.nombre)
-                            .appendTo($select);
+                    $("<option>")
+                        .val(rol.id_rol)
+                        .text(rol.nombre)
+                        .appendTo($select);
 
-                    }
-                );
-
+                });
             },
 
-            error: function (xhr) {
+            error: function (solicitud) {
 
-                mostrarErrorAjax(xhr);
+                mostrarMensaje(
+                    "danger",
+                    obtenerMensajeError(solicitud)
+                );
 
             }
-
         });
-
     }
 
-    function mostrarUsuarios(
-        usuarios
-    ) {
 
-        const $tabla =
-            $("#tablaUsuarios");
+    // ------------------ CARGAR USUARIOS (Trae los miembros de la comunidad actual) ------------------
+
+    function cargarUsuarios() {
+
+        $.ajax({
+            url: apiUrl,
+            method: "GET",
+            dataType: "json",
+
+            success: function (respuesta) {
+
+                if (!respuesta.exito) {
+                    mostrarMensaje(
+                        "danger",
+                        respuesta.mensaje
+                    );
+
+                    return;
+                }
+
+                mostrarUsuarios(
+                    respuesta.usuarios || []
+                );
+            },
+
+            error: function (solicitud) {
+
+                mostrarMensaje(
+                    "danger",
+                    obtenerMensajeError(solicitud)
+                );
+
+            }
+        });
+    }
+
+
+    // ------------------ MOSTRAR USUARIOS (Arma las filas y los botones de la tabla) ------------------
+
+    function mostrarUsuarios(usuarios) {
+
+        const $tabla = $("#tablaUsuarios");
 
         $tabla.empty();
 
@@ -198,15 +156,12 @@ $(function () {
             $("<tr>")
                 .append(
                     $("<td>")
-                        .attr(
-                            "colspan",
-                            5
-                        )
+                        .attr("colspan", 5)
                         .addClass(
                             "text-center text-muted py-4"
                         )
                         .text(
-                            "No hay usuarios registrados."
+                            "No hay miembros registrados."
                         )
                 )
                 .appendTo($tabla);
@@ -214,127 +169,124 @@ $(function () {
             return;
         }
 
-        usuarios.forEach(
-            function (usuario) {
+        usuarios.forEach(function (usuario) {
 
-                const $fila =
-                    $("<tr>");
+            const esUsuarioActual =
+                Number(usuario.id_usuario)
+                === idUsuarioActual;
 
-                $("<td>")
-                    .text(usuario.nombre)
-                    .appendTo($fila);
+            const usuarioActivo =
+                usuario.estado === "Activo";
 
-                $("<td>")
-                    .text(usuario.correo)
-                    .appendTo($fila);
+            const textoBusqueda = [
+                usuario.nombre,
+                usuario.correo,
+                usuario.rol
+            ]
+                .join(" ")
+                .toLowerCase();
 
-                $("<td>")
-                    .text(usuario.rol)
-                    .appendTo($fila);
-
-                const claseEstado =
-                    usuario.estado ===
-                    "Activo"
-                        ? "text-bg-success"
-                        : "text-bg-secondary";
-
-                const $badge =
-                    $("<span>")
-                        .addClass(
-                            "badge "
-                            + claseEstado
-                        )
-                        .text(
-                            usuario.estado
-                        );
-
-                $("<td>")
-                    .append($badge)
-                    .appendTo($fila);
-
-                const $acciones =
-                    $("<td>");
-
-                $("<button>")
-                    .attr(
-                        "type",
-                        "button"
-                    )
-                    .addClass(
-                        "btn btn-sm btn-outline-primary me-2 btn-editar"
-                    )
-                    .data(
-                        "id",
-                        usuario.id_usuario
-                    )
-                    .attr(
-                        "title",
-                        "Editar"
-                    )
-                    .html(
-                        '<i class="bi bi-pencil"></i>'
-                    )
-                    .appendTo(
-                        $acciones
-                    );
-
-                const usuarioActivo =
-                    usuario.estado === "Activo";
-
-                $("<button>")
-                    .attr(
-                        "type",
-                        "button"
-                    )
-                    .addClass(
-                        "btn btn-sm btn-outline-danger btn-eliminar"
-                    )
-                    .data(
-                        "id",
-                        usuario.id_usuario
-                    )
-                    .attr(
-                        "title",
-                        usuarioActivo
-                            ? "Desactivar usuario"
-                            : "Usuario inactivo"
-                    )
-                    .attr(
-                        "aria-label",
-                        usuarioActivo
-                            ? "Desactivar usuario"
-                            : "Usuario inactivo"
-                    )
-                    .prop(
-                        "disabled",
-                        !usuarioActivo
-                    )
-                    .html(
-                        '<i class="bi bi-person-dash"></i>'
-                    )
-                    .appendTo(
-                        $acciones
-                    );
-
-                $acciones.appendTo(
-                    $fila
+            const $fila = $("<tr>")
+                .addClass("fila-usuario")
+                .attr(
+                    "data-busqueda",
+                    textoBusqueda
                 );
 
-                $fila.appendTo(
-                    $tabla
-                );
+            $("<td>")
+                .text(usuario.nombre)
+                .appendTo($fila);
 
-            }
-        );
+            $("<td>")
+                .text(usuario.correo)
+                .appendTo($fila);
 
+            $("<td>")
+                .text(usuario.rol)
+                .appendTo($fila);
+
+            const claseEstado = usuarioActivo
+                ? "text-bg-success"
+                : "text-bg-secondary";
+
+            const $badge = $("<span>")
+                .addClass(
+                    "badge " + claseEstado
+                )
+                .text(usuario.estado);
+
+            $("<td>")
+                .append($badge)
+                .appendTo($fila);
+
+            const $acciones = $("<td>");
+
+            $("<button>")
+                .attr("type", "button")
+                .addClass(
+                    "btn btn-sm btn-outline-primary me-2 btn-editar"
+                )
+                .data(
+                    "id",
+                    usuario.id_usuario
+                )
+                .attr(
+                    "title",
+                    esUsuarioActual
+                        ? "No puedes modificar tu propia membresía"
+                        : "Ver y editar membresía"
+                )
+                .prop(
+                    "disabled",
+                    esUsuarioActual
+                )
+                .html(
+                    '<i class="bi bi-pencil"></i>'
+                )
+                .appendTo($acciones);
+
+            $("<button>")
+                .attr("type", "button")
+                .addClass(
+                    "btn btn-sm btn-outline-danger btn-desactivar"
+                )
+                .data(
+                    "id",
+                    usuario.id_usuario
+                )
+                .attr(
+                    "title",
+                    esUsuarioActual
+                        ? "No puedes desactivar tu propia membresía"
+                        : usuarioActivo
+                            ? "Desactivar membresía"
+                            : "Membresía inactiva"
+                )
+                .prop(
+                    "disabled",
+                    esUsuarioActual || !usuarioActivo
+                )
+                .html(
+                    '<i class="bi bi-person-dash"></i>'
+                )
+                .appendTo($acciones);
+
+            $acciones.appendTo($fila);
+            $fila.appendTo($tabla);
+
+        });
     }
 
-    function cargarUsuario(
-        idUsuario
-    ) {
+
+    // ------------------ CARGAR UN USUARIO (Muestra sus datos en la tarjeta izquierda) ------------------
+
+    function cargarUsuario(idUsuario) {
+
+        if (idUsuario <= 0) {
+            return;
+        }
 
         $.ajax({
-
             url: apiUrl,
             method: "GET",
 
@@ -347,551 +299,327 @@ $(function () {
             success: function (respuesta) {
 
                 if (!respuesta.exito) {
-
                     mostrarMensaje(
-                        respuesta.mensaje,
-                        "danger"
+                        "danger",
+                        respuesta.mensaje
                     );
 
                     return;
                 }
 
-                const usuario =
-                    respuesta.usuario;
+                const usuario = respuesta.usuario;
 
                 $("#idUsuario")
-                    .val(
-                        usuario.id_usuario
-                    );
+                    .val(usuario.id_usuario);
 
                 $("#nombre")
-                    .val(
-                        usuario.nombre
-                    );
+                    .val(usuario.nombre);
 
                 $("#correo")
-                    .val(
-                        usuario.correo
-                    );
+                    .val(usuario.correo);
 
                 $("#telefono")
-                    .val(
-                        usuario.telefono
-                        || ""
-                    );
+                    .val(usuario.telefono || "");
 
                 $("#idRol")
-                    .val(
-                        usuario.id_rol
-                    );
+                    .val(usuario.id_rol)
+                    .prop("disabled", false);
 
                 $("#estado")
-                    .val(
-                        usuario.estado
-                    );
+                    .val(usuario.estado)
+                    .prop("disabled", false);
 
-                $("#contrasena")
-                    .val("");
+                $("#btnGuardarUsuario")
+                    .prop("disabled", false);
 
-                $(
-                    "#nombre, #correo, #telefono, #contrasena"
-                ).prop(
-                    "disabled",
-                    true
-                );
+                $("#btnCancelarEdicion")
+                    .removeClass("d-none");
 
                 $("#tituloFormulario")
-                    .text(
-                        "Editar membresía"
-                    );
+                    .text("Editar membresía");
 
                 $("#textoFormulario")
                     .text(
-                        "Modifique el rol y el estado del usuario en esta comunidad."
+                        "Puedes cambiar el rol y el estado dentro de esta comunidad."
                     );
 
-                $("#ayudaContrasena")
-                    .text(
-                        "Los datos de la cuenta no se modifican desde este módulo."
-                    );
-
-                $("#btnGuardarUsuario")
-                    .html(
-                        '<i class="bi bi-save"></i> Actualizar membresía'
-                    );
-
-                $("#btnCancelarEdicion")
-                    .removeClass(
-                        "d-none"
-                    );
-
-                limpiarErrores();
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-
+                $("#errorRol").text("");
             },
 
-            error: function (xhr) {
+            error: function (solicitud) {
 
-                mostrarErrorAjax(xhr);
+                mostrarMensaje(
+                    "danger",
+                    obtenerMensajeError(solicitud)
+                );
 
             }
-
         });
-
     }
 
-    function guardarUsuario() {
 
-        limpiarErrores();
+    // ------------------ GUARDAR MEMBRESÍA (Actualiza solamente el rol y el estado) ------------------
 
-        if (!validarFormulario()) {
+    function guardarMembresia() {
+
+        const idUsuario = Number(
+            $("#idUsuario").val()
+        );
+
+        const idRol = Number(
+            $("#idRol").val()
+        );
+
+        const estado =
+            $("#estado").val();
+
+        $("#errorRol").text("");
+
+        if (idUsuario <= 0) {
+
+            mostrarMensaje(
+                "danger",
+                "Selecciona un miembro de la tabla."
+            );
+
             return;
         }
 
-        const idUsuario =
-            $("#idUsuario").val();
+        if (idRol <= 0) {
 
-        const esEdicion =
-            idUsuario !== "";
-
-        const datos = esEdicion
-            ? {
-                id_rol:
-                    parseInt(
-                        $("#idRol").val(),
-                        10
-                    ),
-
-                estado:
-                    $("#estado").val()
-            }
-            : {
-                nombre:
-                    $("#nombre")
-                        .val()
-                        .trim(),
-
-                correo:
-                    $("#correo")
-                        .val()
-                        .trim(),
-
-                telefono:
-                    $("#telefono")
-                        .val()
-                        .trim(),
-
-                contrasena:
-                    $("#contrasena")
-                        .val(),
-
-                id_rol:
-                    parseInt(
-                        $("#idRol").val(),
-                        10
-                    ),
-
-                estado:
-                    $("#estado").val()
-            };
-
-        const url =
-            esEdicion
-                ? apiUrl
-                    + "?id="
-                    + encodeURIComponent(
-                        idUsuario
-                    )
-                : apiUrl;
-
-        const metodo =
-            esEdicion
-                ? "PUT"
-                : "POST";
-
-        $("#btnGuardarUsuario")
-            .prop(
-                "disabled",
-                true
+            $("#errorRol").text(
+                "Selecciona un rol."
             );
 
+            return;
+        }
+
+        if (
+            estado !== "Activo"
+            && estado !== "Inactivo"
+        ) {
+
+            mostrarMensaje(
+                "danger",
+                "Selecciona un estado válido."
+            );
+
+            return;
+        }
+
         $.ajax({
+            url:
+                apiUrl
+                + "?id="
+                + encodeURIComponent(idUsuario),
 
-            url: url,
-
-            method: metodo,
-
-            contentType:
-                "application/json; charset=utf-8",
-
+            method: "PUT",
+            contentType: "application/json",
             dataType: "json",
 
             headers: {
-                "X-CSRF-Token":
-                    csrfToken
+                "X-CSRF-Token": csrfToken
             },
 
-            data:
-                JSON.stringify(
-                    datos
-                ),
+            data: JSON.stringify({
+                id_rol: idRol,
+                estado: estado
+            }),
 
-            success: function (
-                respuesta
-            ) {
+            success: function (respuesta) {
 
                 mostrarMensaje(
-                    respuesta.mensaje,
-                    "success"
+                    "success",
+                    respuesta.mensaje
                 );
 
-                limpiarFormulario();
-
+                limpiarSeleccion();
                 cargarUsuarios();
-
             },
 
-            error: function (xhr) {
+            error: function (solicitud) {
 
-                mostrarErrorAjax(xhr);
-
-            },
-
-            complete: function () {
-
-                $("#btnGuardarUsuario")
-                    .prop(
-                        "disabled",
-                        false
-                    );
+                mostrarMensaje(
+                    "danger",
+                    obtenerMensajeError(solicitud)
+                );
 
             }
-
         });
-
     }
 
-    function eliminarUsuario(
-        idUsuario
-    ) {
 
-        const confirmar =
-            window.confirm(
-                "¿Desea desactivar este usuario de la comunidad?"
-            );
+    // ------------------ DESACTIVAR USUARIO (Quita la membresía sin borrar la cuenta) ------------------
+
+    function desactivarUsuario(idUsuario) {
+
+        const confirmar = window.confirm(
+            "¿Deseas desactivar esta membresía?"
+        );
 
         if (!confirmar) {
             return;
         }
 
         $.ajax({
-
             url:
                 apiUrl
                 + "?id="
-                + encodeURIComponent(
-                    idUsuario
-                ),
+                + encodeURIComponent(idUsuario),
 
             method: "DELETE",
-
             dataType: "json",
 
             headers: {
-                "X-CSRF-Token":
-                    csrfToken
+                "X-CSRF-Token": csrfToken
             },
 
-            success: function (
-                respuesta
-            ) {
+            success: function (respuesta) {
 
                 mostrarMensaje(
-                    respuesta.mensaje,
-                    "success"
+                    "success",
+                    respuesta.mensaje
                 );
 
+                limpiarSeleccion();
                 cargarUsuarios();
-
             },
 
-            error: function (xhr) {
+            error: function (solicitud) {
 
-                mostrarErrorAjax(xhr);
+                mostrarMensaje(
+                    "danger",
+                    obtenerMensajeError(solicitud)
+                );
 
+            }
+        });
+    }
+
+
+    function filtrarUsuarios() {
+
+        const texto = String(
+            $("#buscarUsuario").val()
+        )
+            .toLowerCase()
+            .trim();
+
+        let cantidadVisible = 0;
+
+        $("#filaSinResultados").remove();
+
+        const $filas =
+            $("#tablaUsuarios .fila-usuario");
+
+        if ($filas.length === 0) {
+            return;
+        }
+
+        $filas.each(function () {
+
+            const datos = String(
+                $(this).attr("data-busqueda") || ""
+            );
+
+            const mostrar =
+                datos.includes(texto);
+
+            $(this).toggle(mostrar);
+
+            if (mostrar) {
+                cantidadVisible++;
             }
 
         });
 
+        if (cantidadVisible === 0) {
+
+            $("<tr>")
+                .attr(
+                    "id",
+                    "filaSinResultados"
+                )
+                .append(
+                    $("<td>")
+                        .attr("colspan", 5)
+                        .addClass(
+                            "text-center text-muted py-4"
+                        )
+                        .text(
+                            "No se encontraron miembros."
+                        )
+                )
+                .appendTo("#tablaUsuarios");
+        }
     }
 
-    function validarFormulario() {
 
-        let valido = true;
+    function limpiarSeleccion() {
 
-        const nombre =
-            $("#nombre")
-                .val()
-                .trim();
+        $("#idUsuario").val("");
+        $("#nombre").val("");
+        $("#correo").val("");
+        $("#telefono").val("");
 
-        const correo =
-            $("#correo")
-                .val()
-                .trim();
-
-        const contrasena =
-            $("#contrasena")
-                .val();
-
-        const idRol =
-            $("#idRol").val();
-
-        const idUsuario =
-            $("#idUsuario").val();
-
-        if (nombre.length < 3) {
-
-            $("#errorNombre")
-                .text(
-                    "Ingrese un nombre de al menos 3 caracteres."
-                );
-
-            $("#nombre")
-                .addClass(
-                    "is-invalid"
-                );
-
-            valido = false;
-
-        }
-
-        if (
-            correo === ""
-            || !correoValido(
-                correo
-            )
-        ) {
-
-            $("#errorCorreo")
-                .text(
-                    "Ingrese un correo electrónico válido."
-                );
-
-            $("#correo")
-                .addClass(
-                    "is-invalid"
-                );
-
-            valido = false;
-
-        }
-
-        if (
-            idUsuario === ""
-            && contrasena.length < 6
-        ) {
-
-            $("#errorContrasena")
-                .text(
-                    "La contraseña debe tener al menos 6 caracteres."
-                );
-
-            $("#contrasena")
-                .addClass(
-                    "is-invalid"
-                );
-
-            valido = false;
-
-        }
-
-        if (
-            idUsuario !== ""
-            && contrasena !== ""
-            && contrasena.length < 6
-        ) {
-
-            $("#errorContrasena")
-                .text(
-                    "La nueva contraseña debe tener al menos 6 caracteres."
-                );
-
-            $("#contrasena")
-                .addClass(
-                    "is-invalid"
-                );
-
-            valido = false;
-
-        }
-
-        if (!idRol) {
-
-            $("#errorRol")
-                .text(
-                    "Seleccione un rol."
-                );
-
-            $("#idRol")
-                .addClass(
-                    "is-invalid"
-                );
-
-            valido = false;
-
-        }
-
-        return valido;
-
-    }
-
-    function correoValido(
-        correo
-    ) {
-
-        const expresion =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        return expresion.test(
-            correo
-        );
-
-    }
-
-    function limpiarFormulario() {
-
-        $("#formUsuario")[0]
-            .reset();
-
-        $("#idUsuario")
-            .val("");
-
-        $(
-            "#nombre, #correo, #telefono, #contrasena"
-        ).prop(
-            "disabled",
-            false
-        );
+        $("#idRol")
+            .val("")
+            .prop("disabled", true);
 
         $("#estado")
-            .val("Activo");
+            .val("")
+            .prop("disabled", true);
+
+        $("#btnGuardarUsuario")
+            .prop("disabled", true);
+
+        $("#btnCancelarEdicion")
+            .addClass("d-none");
 
         $("#tituloFormulario")
-            .text(
-                "Registrar usuario"
-            );
+            .text("Datos del miembro");
 
         $("#textoFormulario")
             .text(
-                "Complete los datos del nuevo miembro."
+                "Selecciona un usuario de la tabla para consultar su información."
             );
 
-        $("#ayudaContrasena")
-            .text(
-                "Es obligatoria al crear un usuario."
-            );
-
-        $("#btnGuardarUsuario")
-            .html(
-                '<i class="bi bi-save"></i> Guardar usuario'
-            );
-
-        $("#btnCancelarEdicion")
-            .addClass(
-                "d-none"
-            );
-
-        limpiarErrores();
-
+        $("#errorRol").text("");
     }
 
-    function limpiarErrores() {
 
-        $(
-            "#errorNombre, "
-            + "#errorCorreo, "
-            + "#errorContrasena, "
-            + "#errorRol"
-        ).text("");
+    function mostrarMensaje(tipo, mensaje) {
 
-        $(
-            "#nombre, "
-            + "#correo, "
-            + "#contrasena, "
-            + "#idRol"
-        ).removeClass(
-            "is-invalid"
-        );
-
-    }
-
-    function mostrarMensaje(
-        mensaje,
-        tipo
-    ) {
-
-        const $alerta =
-            $("<div>")
-                .addClass(
-                    "alert alert-"
-                    + tipo
-                    + " alert-dismissible fade show"
-                )
-                .attr(
-                    "role",
-                    "alert"
-                )
-                .text(mensaje);
-
-        $("<button>")
-            .attr({
-                type: "button",
-                "data-bs-dismiss":
-                    "alert",
-                "aria-label":
-                    "Cerrar"
-            })
+        const $alerta = $("<div>")
             .addClass(
-                "btn-close"
+                "alert alert-" + tipo
             )
-            .appendTo(
-                $alerta
+            .attr(
+                "role",
+                "alert"
+            )
+            .text(
+                mensaje || "Ocurrió un error."
             );
 
         $("#mensajeUsuarios")
             .empty()
-            .append(
-                $alerta
-            );
-
+            .append($alerta);
     }
 
-    function mostrarErrorAjax(
-        xhr
-    ) {
 
-        let mensaje =
-            "Ocurrió un error al procesar la solicitud.";
+    function obtenerMensajeError(solicitud) {
 
         if (
-            xhr.responseJSON
-            && xhr.responseJSON.mensaje
+            solicitud.responseJSON
+            && solicitud.responseJSON.mensaje
         ) {
-
-            mensaje =
-                xhr.responseJSON.mensaje;
-
+            return solicitud
+                .responseJSON
+                .mensaje;
         }
 
-        mostrarMensaje(
-            mensaje,
-            "danger"
-        );
-
+        return "Ocurrió un error al procesar la solicitud.";
     }
 
 });

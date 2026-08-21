@@ -116,7 +116,16 @@ $rutas = [
     ],
 
     'auth' => [
+        'registro' => [
+        AuthController::class,
+        'registro',
+        ],
 
+        'registrar' => [
+            AuthController::class,
+            'registrar',
+        ],
+            
         'login' => [
             AuthController::class,
             'login',
@@ -132,18 +141,41 @@ $rutas = [
             'seleccionarComunidad',
         ],
 
+        'crearcomunidad' => [
+            AuthController::class,
+            'crearComunidad',
+        ],
+
+        'guardarcomunidad' => [
+            AuthController::class,
+            'guardarComunidad',
+        ],
+
         'confirmarcomunidad' => [
             AuthController::class,
             'confirmarComunidad',
+        ],
+
+        'unirsecomunidad' => [
+        AuthController::class,
+        'unirseComunidad',
         ],
 
         'logout' => [
             AuthController::class,
             'logout',
         ],
+    ],
+
+    'comunidad' => [
+        'salir' => [
+            ComunidadController::class,
+            'salir',
+        ],
 
     ],
 
+    
     'dashboard' => [
 
         'index' => [
@@ -162,11 +194,58 @@ $rutas = [
 
     ],
 
+    'perfil' => [
+
+        'index' => [
+            PerfilController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            PerfilController::class,
+            'guardar',
+        ],
+
+    ],
+
     'proyecto' => [
 
-    'index' => [
-        ProyectoController::class,
-        'index',
+        'index' => [
+            ProyectoController::class,
+            'index',
+        ],
+
+    ],
+
+    'actividades' => [
+
+        'index' => [
+            ActividadController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            ActividadController::class,
+            'guardar',
+        ],
+
+    ],
+
+    'grupos' => [
+
+        'index' => [
+            GrupoController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            GrupoController::class,
+            'guardar',
+        ],
+
+        'asociar' => [
+            GrupoController::class,
+            'asociar',
         ],
 
     ],

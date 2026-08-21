@@ -159,26 +159,6 @@ try {
         );
     }
 
-    if ($metodo === 'POST') {
-        $datos = leerJson();
-
-        $nuevoId =
-            $controlador->crear(
-                $datos,
-                $idComunidad
-            );
-
-        responderJson(
-            [
-                'exito' => true,
-                'mensaje' =>
-                    'Usuario registrado correctamente.',
-                'id_usuario' => $nuevoId,
-            ],
-            201
-        );
-    }
-
     if ($metodo === 'PUT') {
         if (
             $idUsuario === false
@@ -194,13 +174,14 @@ try {
         $controlador->actualizar(
             (int) $idUsuario,
             $datos,
-            $idComunidad
+            $idComunidad,
+            $idUsuarioActual
         );
 
         responderJson([
             'exito' => true,
             'mensaje' =>
-                'Usuario actualizado correctamente.',
+                'Membresía actualizada correctamente.',
         ]);
     }
 
@@ -223,7 +204,7 @@ try {
         responderJson([
             'exito' => true,
             'mensaje' =>
-                'Usuario desactivado correctamente.',
+                'Membresía desactivada correctamente.',
         ]);
     }
 

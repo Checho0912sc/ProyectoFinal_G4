@@ -13,7 +13,7 @@ final class Proyecto
         private string $fechaInicio,
         private ?string $fechaFin,
         private string $estado,
-        private float $presupuesto
+        private float $presupuesto  
     ) {
     }
 

@@ -277,7 +277,21 @@
                                             ></i>
                                             Ingresar
                                         </button>
+                                        <div class="text-center mt-3">
+                                            <span class="text-muted">
+                                                ¿No tienes una cuenta?
+                                            </span>
 
+                                            <a
+                                                href="<?= e(url(
+                                                    'index.php?controller=auth'
+                                                    . '&action=registro'
+                                                )) ?>"
+                                                class="login-link"
+                                            >
+                                                Crear cuenta
+                                            </a>
+                                        </div>
                                     </form>
                                 </div>
                             </div>

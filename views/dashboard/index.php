@@ -43,12 +43,12 @@ $accesos = [
     ],
     [
         'nombre' => 'Actividades',
-        'ruta' => 'actividades.html',
+        'ruta' => 'index.php?controller=actividades&action=index',
         'icono' => 'bi-calendar-check',
     ],
     [
         'nombre' => 'Grupos',
-        'ruta' => 'grupos.html',
+        'ruta' => 'index.php?controller=grupos&action=index',
         'icono' => 'bi-person-workspace',
     ],
     [
@@ -88,6 +88,17 @@ if (Auth::tieneRol('Administrador')) {
     <section class="dashboard-section py-5">
 
         <div class="container">
+
+            <?php if ($error !== null): ?>
+
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    <?= e($error) ?>
+                </div>
+
+            <?php endif; ?>
 
             <!-- ==========================================
                  ENCABEZADO
