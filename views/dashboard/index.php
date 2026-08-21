@@ -27,20 +27,28 @@ $tarjetasResumen = [
     ],
 ];
 
+/*
+|--------------------------------------------------------------------------
+| ACCESOS RÁPIDOS
+|--------------------------------------------------------------------------
+| Proyectos está disponible para todos los usuarios autenticados.
+| Usuarios solamente se agrega si el usuario es Administrador.
+*/
+
 $accesos = [
     [
         'nombre' => 'Proyectos',
-        'ruta' => 'proyecto.html',
+        'ruta' => 'index.php?controller=proyecto&action=index',
         'icono' => 'bi-folder-check',
     ],
     [
         'nombre' => 'Actividades',
-        'ruta' => 'actividades.html',
+        'ruta' => 'index.php?controller=actividades&action=index',
         'icono' => 'bi-calendar-check',
     ],
     [
         'nombre' => 'Grupos',
-        'ruta' => 'grupos.html',
+        'ruta' => 'index.php?controller=grupos&action=index',
         'icono' => 'bi-person-workspace',
     ],
     [
@@ -55,19 +63,46 @@ $accesos = [
     ],
 ];
 
+/*
+|--------------------------------------------------------------------------
+| USUARIOS SOLO PARA ADMINISTRADOR
+|--------------------------------------------------------------------------
+*/
+
 if (Auth::tieneRol('Administrador')) {
-    array_unshift($accesos, [
-        'nombre' => 'Usuarios',
-        'ruta' => 'usuario.html',
-        'icono' => 'bi-people',
-    ]);
+
+    array_unshift(
+        $accesos,
+        [
+            'nombre' => 'Usuarios',
+            'ruta' => 'index.php?controller=usuario&action=index',
+            'icono' => 'bi-people',
+        ]
+    );
 }
 
 ?>
 
 <main class="main-content">
+
     <section class="dashboard-section py-5">
+
         <div class="container">
+
+            <?php if ($error !== null): ?>
+
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    <?= e($error) ?>
+                </div>
+
+            <?php endif; ?>
+
+            <!-- ==========================================
+                 ENCABEZADO
+            =========================================== -->
 
             <div class="row align-items-center mb-4">
 
@@ -78,16 +113,26 @@ if (Auth::tieneRol('Administrador')) {
                     </span>
 
                     <h1 class="dashboard-title">
+
                         Hola,
                         <?= e($usuarioActual['nombre']) ?>
+
                     </h1>
 
                     <p class="dashboard-text">
+
                         Resumen de
                         <?= e($usuarioActual['comunidad']) ?>.
+
                     </p>
 
                 </div>
+
+
+                <!--
+                    Administrador y Coordinador
+                    pueden crear proyectos.
+                -->
 
                 <?php if (
                     Auth::tieneRol(
@@ -100,20 +145,30 @@ if (Auth::tieneRol('Administrador')) {
                         class="col-12 col-lg-4
                         text-lg-end mt-3 mt-lg-0"
                     >
+
                         <a
                             href="<?= e(url(
-                                'proyecto.html'
+                                'index.php?controller=proyecto&action=index'
                             )) ?>"
                             class="btn btn-success btn-lg"
                         >
+
                             <i class="bi bi-plus-circle"></i>
+
                             Nuevo proyecto
+
                         </a>
+
                     </div>
 
                 <?php endif; ?>
 
             </div>
+
+
+            <!-- ==========================================
+                 TARJETAS DE RESUMEN
+            =========================================== -->
 
             <div class="row g-4 mb-5">
 
@@ -121,23 +176,27 @@ if (Auth::tieneRol('Administrador')) {
                     $tarjetasResumen as $tarjeta
                 ): ?>
 
-                    <div
-                        class="col-12 col-md-6 col-xl-3"
-                    >
+                    <div class="col-12 col-md-6 col-xl-3">
+
                         <div
                             class="dashboard-resumen-card h-100"
                         >
+
                             <div
                                 class="dashboard-resumen-icono"
                             >
+
                                 <i
                                     class="bi <?= e(
                                         $tarjeta['icono']
                                     ) ?>"
                                 ></i>
+
                             </div>
 
+
                             <div>
+
                                 <h3>
                                     <?= e($tarjeta['valor']) ?>
                                 </h3>
@@ -149,17 +208,27 @@ if (Auth::tieneRol('Administrador')) {
                                 <p>
                                     <?= e($tarjeta['texto']) ?>
                                 </p>
+
                             </div>
+
                         </div>
+
                     </div>
 
                 <?php endforeach; ?>
 
             </div>
 
+
             <div class="row g-4">
 
+
+                <!-- ======================================
+                     PROYECTOS RECIENTES
+                ======================================= -->
+
                 <div class="col-12 col-xl-8">
+
                     <div class="dashboard-card h-100">
 
                         <div
@@ -167,24 +236,41 @@ if (Auth::tieneRol('Administrador')) {
                             justify-content-between
                             align-items-center mb-4"
                         >
+
                             <div>
-                                <h4>Proyectos recientes</h4>
+
+                                <h4>
+                                    Proyectos recientes
+                                </h4>
 
                                 <p class="text-muted mb-0">
+
                                     Últimos proyectos de esta
                                     comunidad.
+
                                 </p>
+
                             </div>
+
+
+                            <!--
+                                Ahora redirige al módulo MVC
+                                completo de proyectos.
+                            -->
 
                             <a
                                 href="<?= e(url(
-                                    'proyecto.html'
+                                    'index.php?controller=proyecto&action=index'
                                 )) ?>"
                                 class="btn btn-outline-success"
                             >
+
                                 Ver todos
+
                             </a>
+
                         </div>
+
 
                         <div class="table-responsive">
 
@@ -192,14 +278,20 @@ if (Auth::tieneRol('Administrador')) {
                                 class="table align-middle
                                 dashboard-table"
                             >
+
                                 <thead>
+
                                     <tr>
+
                                         <th>Proyecto</th>
                                         <th>Responsable</th>
                                         <th>Estado</th>
                                         <th>Avance</th>
+
                                     </tr>
+
                                 </thead>
+
 
                                 <tbody>
 
@@ -208,17 +300,22 @@ if (Auth::tieneRol('Administrador')) {
                                     ): ?>
 
                                         <tr>
+
                                             <td
                                                 colspan="4"
                                                 class="text-center
                                                 text-muted py-4"
                                             >
+
                                                 No hay proyectos
                                                 registrados.
+
                                             </td>
+
                                         </tr>
 
                                     <?php endif; ?>
+
 
                                     <?php foreach (
                                         $proyectos as $proyecto
@@ -236,9 +333,11 @@ if (Auth::tieneRol('Administrador')) {
                                             )
                                         );
 
+
                                         $claseEstado = match (
                                             $proyecto['estado']
                                         ) {
+
                                             'En proceso' =>
                                                 'text-bg-success',
 
@@ -257,44 +356,59 @@ if (Auth::tieneRol('Administrador')) {
 
                                         ?>
 
+
                                         <tr>
+
                                             <td>
+
                                                 <?= e(
                                                     $proyecto[
                                                         'nombre'
                                                     ]
                                                 ) ?>
+
                                             </td>
 
+
                                             <td>
+
                                                 <?= e(
                                                     $proyecto[
                                                         'responsable'
                                                     ]
                                                 ) ?>
+
                                             </td>
 
+
                                             <td>
+
                                                 <span
                                                     class="badge
                                                     <?= e(
                                                         $claseEstado
                                                     ) ?>"
                                                 >
+
                                                     <?= e(
                                                         $proyecto[
                                                             'estado'
                                                         ]
                                                     ) ?>
+
                                                 </span>
+
                                             </td>
 
+
                                             <td>
+
                                                 <div
                                                     class="d-flex
                                                     align-items-center
                                                     gap-2"
                                                 >
+
                                                     <div
                                                         class="progress
                                                         flex-grow-1"
@@ -305,6 +419,7 @@ if (Auth::tieneRol('Administrador')) {
                                                         aria-valuemin="0"
                                                         aria-valuemax="100"
                                                     >
+
                                                         <div
                                                             class="progress-bar
                                                             bg-success"
@@ -313,34 +428,53 @@ if (Auth::tieneRol('Administrador')) {
                                                                 $avance
                                                             ) ?>%"
                                                         ></div>
+
                                                     </div>
 
+
                                                     <span>
+
                                                         <?= e(
                                                             $avance
                                                         ) ?>%
+
                                                     </span>
+
                                                 </div>
+
                                             </td>
+
                                         </tr>
 
                                     <?php endforeach; ?>
 
                                 </tbody>
+
                             </table>
 
                         </div>
+
                     </div>
+
                 </div>
 
+
+                <!-- ======================================
+                     ACTIVIDADES PRÓXIMAS
+                ======================================= -->
+
                 <div class="col-12 col-xl-4">
+
                     <div class="dashboard-card h-100">
 
-                        <h4>Actividades próximas</h4>
+                        <h4>
+                            Actividades próximas
+                        </h4>
 
                         <p class="text-muted">
                             Agenda de los siguientes días.
                         </p>
+
 
                         <div class="dashboard-lista">
 
@@ -349,11 +483,14 @@ if (Auth::tieneRol('Administrador')) {
                             ): ?>
 
                                 <p class="text-muted mb-0">
+
                                     No hay actividades
                                     programadas.
+
                                 </p>
 
                             <?php endif; ?>
+
 
                             <?php foreach (
                                 $actividades as $actividad
@@ -362,54 +499,92 @@ if (Auth::tieneRol('Administrador')) {
                                 <div
                                     class="dashboard-lista-item"
                                 >
+
                                     <div
                                         class="dashboard-lista-icono"
                                     >
+
                                         <i
                                             class="bi
                                             bi-calendar-check"
                                         ></i>
+
                                     </div>
 
+
                                     <div>
+
                                         <h6>
+
                                             <?= e(
-                                                $actividad['titulo']
+                                                $actividad[
+                                                    'titulo'
+                                                ]
                                             ) ?>
+
                                         </h6>
 
+
                                         <p>
+
                                             <?= e(fechaCorta(
-                                                $actividad['fecha']
+                                                $actividad[
+                                                    'fecha'
+                                                ]
                                             )) ?>,
 
                                             <?= e(horaCorta(
-                                                $actividad['hora']
+                                                $actividad[
+                                                    'hora'
+                                                ]
                                             )) ?>
+
                                         </p>
 
-                                        <small class="text-muted">
+
+                                        <small
+                                            class="text-muted"
+                                        >
+
                                             <?= e(
-                                                $actividad['lugar']
+                                                $actividad[
+                                                    'lugar'
+                                                ]
                                             ) ?>
+
                                         </small>
+
                                     </div>
+
                                 </div>
 
                             <?php endforeach; ?>
 
                         </div>
+
                     </div>
+
                 </div>
 
+
+                <!-- ======================================
+                     MOVIMIENTOS FINANCIEROS
+                ======================================= -->
+
                 <div class="col-12 col-xl-6">
+
                     <div class="dashboard-card h-100">
 
-                        <h4>Movimientos financieros</h4>
+                        <h4>
+                            Movimientos financieros
+                        </h4>
 
                         <p class="text-muted">
+
                             Ingresos y egresos recientes.
+
                         </p>
+
 
                         <div class="dashboard-lista">
 
@@ -418,10 +593,13 @@ if (Auth::tieneRol('Administrador')) {
                             ): ?>
 
                                 <p class="text-muted mb-0">
+
                                     No hay movimientos registrados.
+
                                 </p>
 
                             <?php endif; ?>
+
 
                             <?php foreach (
                                 $movimientos as $movimiento
@@ -430,25 +608,40 @@ if (Auth::tieneRol('Administrador')) {
                                 <div
                                     class="dashboard-movimiento"
                                 >
+
                                     <div>
+
                                         <h6>
+
                                             <?= e(
                                                 $movimiento[
                                                     'descripcion'
                                                 ]
                                             ) ?>
+
                                         </h6>
 
+
                                         <p>
+
                                             <?= e(
-                                                $movimiento['tipo']
+                                                $movimiento[
+                                                    'tipo'
+                                                ]
                                             ) ?>
+
                                             ·
+
                                             <?= e(fechaCorta(
-                                                $movimiento['fecha']
+                                                $movimiento[
+                                                    'fecha'
+                                                ]
                                             )) ?>
+
                                         </p>
+
                                     </div>
+
 
                                     <span
                                         class="<?= $movimiento[
@@ -457,26 +650,44 @@ if (Auth::tieneRol('Administrador')) {
                                             ? 'movimiento-ingreso'
                                             : 'movimiento-egreso' ?>"
                                     >
+
                                         <?= e(colones(
-                                            $movimiento['monto']
+                                            $movimiento[
+                                                'monto'
+                                            ]
                                         )) ?>
+
                                     </span>
+
                                 </div>
 
                             <?php endforeach; ?>
 
                         </div>
+
                     </div>
+
                 </div>
 
+
+                <!-- ======================================
+                     ACCESOS RÁPIDOS
+                ======================================= -->
+
                 <div class="col-12 col-xl-6">
+
                     <div class="dashboard-card h-100">
 
-                        <h4>Accesos rápidos</h4>
+                        <h4>
+                            Accesos rápidos
+                        </h4>
 
                         <p class="text-muted">
+
                             Módulos disponibles en el proyecto.
+
                         </p>
+
 
                         <div class="dashboard-accesos">
 
@@ -489,22 +700,31 @@ if (Auth::tieneRol('Administrador')) {
                                         $acceso['ruta']
                                     )) ?>"
                                 >
+
                                     <i
                                         class="bi <?= e(
                                             $acceso['icono']
                                         ) ?>"
                                     ></i>
 
-                                    <?= e($acceso['nombre']) ?>
+                                    <?= e(
+                                        $acceso['nombre']
+                                    ) ?>
+
                                 </a>
 
                             <?php endforeach; ?>
 
                         </div>
+
                     </div>
+
                 </div>
 
             </div>
+
         </div>
+
     </section>
+
 </main>

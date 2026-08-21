@@ -22,6 +22,8 @@ final class DashboardController extends Controller
             (int) $usuarioActual['id_comunidad']
         );
 
+        $error = Auth::flash('error');
+
         $this->render('dashboard/index', [
             'titulo' => 'Dashboard',
 
@@ -34,6 +36,8 @@ final class DashboardController extends Controller
             'actividades' => $panel['actividades'],
 
             'movimientos' => $panel['movimientos'],
+            
+            'error' => $error,
         ]);
     }
 }

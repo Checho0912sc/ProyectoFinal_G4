@@ -32,7 +32,8 @@ final class Auth // se va a encargar de toda la autenticacion
         session_start();
     }
 
-    public static function login( //Se validan los datos y se hace el login
+// ------------------ VALIDACION DE DATOS PARA LOGIN (Se adjunta token CSRF para seguridad)
+    public static function login( 
         array $usuario,
         array $membresia
     ): void {
@@ -164,6 +165,7 @@ final class Auth // se va a encargar de toda la autenticacion
         exit('No tienes permisos para realizar esta acción.');
     }
 
+    // ------------------ Se genera el token CSRF para temas de seguridad
     public static function csrfToken(): string
     {
         if (!isset($_SESSION['csrf_token'])) {
@@ -175,6 +177,7 @@ final class Auth // se va a encargar de toda la autenticacion
         return $_SESSION['csrf_token'];
     }
 
+    // ------------------ Se valida el token CSRF para permitir el acceso
     public static function validarCsrf(?string $token): bool
     {
         return is_string($token)

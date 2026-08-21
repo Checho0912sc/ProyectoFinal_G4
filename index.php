@@ -9,18 +9,28 @@ require_once __DIR__ . '/core/helpers.php';
 $directorioBase = str_replace(
     '\\',
     '/',
-    dirname($_SERVER['SCRIPT_NAME'] ?? '/')
+    dirname(
+        $_SERVER['SCRIPT_NAME'] ?? '/'
+    )
 );
 
 define(
     'BASE_URL',
-    in_array($directorioBase, ['/', '.'], true)
+    in_array(
+        $directorioBase,
+        ['/', '.'],
+        true
+    )
         ? ''
-        : rtrim($directorioBase, '/')
+        : rtrim(
+            $directorioBase,
+            '/'
+        )
 );
 
 spl_autoload_register(
     function (string $clase): void {
+
         $directorios = [
             'core',
             'models',
@@ -29,8 +39,12 @@ spl_autoload_register(
             'controllers',
         ];
 
-        foreach ($directorios as $directorio) {
-            $archivo = __DIR__
+        foreach (
+            $directorios as $directorio
+        ) {
+
+            $archivo =
+                __DIR__
                 . '/'
                 . $directorio
                 . '/'
@@ -38,17 +52,27 @@ spl_autoload_register(
                 . '.php';
 
             if (is_file($archivo)) {
+
                 require_once $archivo;
+
                 return;
+
             }
+
         }
+
     }
 );
 
 Auth::iniciarSesion();
 
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: SAMEORIGIN');
+header(
+    'X-Content-Type-Options: nosniff'
+);
+
+header(
+    'X-Frame-Options: SAMEORIGIN'
+);
 
 header(
     'Referrer-Policy: '
@@ -60,29 +84,48 @@ header(
     . 'no-store, no-cache, must-revalidate, max-age=0'
 );
 
-header('Pragma: no-cache');
-
-$controladorSolicitado = strtolower(
-    (string) (
-        $_GET['controller'] ?? 'inicio'
-    )
+header(
+    'Pragma: no-cache'
 );
 
-$accionSolicitada = strtolower(
-    (string) (
-        $_GET['action'] ?? 'index'
-    )
-);
+$controladorSolicitado =
+    strtolower(
+        (string) (
+            $_GET['controller']
+            ?? 'inicio'
+        )
+    );
+
+$accionSolicitada =
+    strtolower(
+        (string) (
+            $_GET['action']
+            ?? 'index'
+        )
+    );
 
 $rutas = [
+
     'inicio' => [
+
         'index' => [
             InicioController::class,
             'index',
         ],
+
     ],
 
     'auth' => [
+        'registro' => [
+        AuthController::class,
+        'registro',
+        ],
+
+        'registrar' => [
+            AuthController::class,
+            'registrar',
+        ],
+            
         'login' => [
             AuthController::class,
             'login',
@@ -98,9 +141,24 @@ $rutas = [
             'seleccionarComunidad',
         ],
 
+        'crearcomunidad' => [
+            AuthController::class,
+            'crearComunidad',
+        ],
+
+        'guardarcomunidad' => [
+            AuthController::class,
+            'guardarComunidad',
+        ],
+
         'confirmarcomunidad' => [
             AuthController::class,
             'confirmarComunidad',
+        ],
+
+        'unirsecomunidad' => [
+        AuthController::class,
+        'unirseComunidad',
         ],
 
         'logout' => [
@@ -109,13 +167,91 @@ $rutas = [
         ],
     ],
 
+    'comunidad' => [
+        'salir' => [
+            ComunidadController::class,
+            'salir',
+        ],
+
+    ],
+
+    
     'dashboard' => [
+
         'index' => [
             DashboardController::class,
             'index',
         ],
+
     ],
+
+    'usuario' => [
+
+        'index' => [
+            UsuarioController::class,
+            'index',
+        ],
+
+    ],
+
+       'perfil' => [
+
+        'index' => [
+            PerfilController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            PerfilController::class,
+            'guardar',
+        ],
+
+    ],
+
+    'proyecto' => [
+
+        'index' => [
+            ProyectoController::class,
+            'index',
+        ],
+
+    ],
+
+    'actividades' => [
+
+        'index' => [
+            ActividadController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            ActividadController::class,
+            'guardar',
+        ],
+
+    ],
+
+    'grupos' => [
+
+        'index' => [
+            GrupoController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            GrupoController::class,
+            'guardar',
+        ],
+
+        'asociar' => [
+            GrupoController::class,
+            'asociar',
+        ],
+
+    ],
+
     'finanzas' => [
+
         'index' => [
             FinanzasController::class,
             'index',
@@ -130,16 +266,19 @@ $rutas = [
             FinanzasController::class,
             'anular',
         ],
+
     ],
 
     'reportes' => [
+
         'index' => [
             ReporteController::class,
             'index',
         ],
-    ],
-];
 
+    ],
+
+];
 if (
     !isset(
         $rutas[
@@ -149,9 +288,13 @@ if (
         ]
     )
 ) {
+
     http_response_code(404);
 
-    exit('La página solicitada no existe.');
+    exit(
+        'La página solicitada no existe.'
+    );
+
 }
 
 [
@@ -164,23 +307,34 @@ if (
 ];
 
 try {
-    $controlador = new $claseControlador();
+
+    $controlador =
+        new $claseControlador();
 
     $controlador->$metodo();
+
 } catch (Throwable $error) {
-    error_log($error->__toString());
+
+    error_log(
+        $error->__toString()
+    );
 
     http_response_code(500);
 
     if (APP_DEBUG) {
+
         exit(
             'Error interno: '
-            . e($error->getMessage())
+            . e(
+                $error->getMessage()
+            )
         );
+
     }
 
     exit(
         'Ocurrió un error interno. '
         . 'Inténtalo nuevamente.'
     );
+
 }

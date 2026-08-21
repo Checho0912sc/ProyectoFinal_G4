@@ -32,7 +32,8 @@ abstract class Controller
         exit;
     }
 
-    protected function exigirMetodo(string $metodo): void //validacion de metodos
+    // ------------------ EXIGE METODO POST [Si no detecta uno, lo asigna GET y no pasa (Para temas de seguirdad)]
+    protected function exigirMetodo(string $metodo): void 
     {
         $metodoRecibido = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
