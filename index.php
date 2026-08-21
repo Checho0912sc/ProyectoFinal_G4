@@ -194,7 +194,7 @@ $rutas = [
 
     ],
 
-    'perfil' => [
+       'perfil' => [
 
         'index' => [
             PerfilController::class,
@@ -250,8 +250,35 @@ $rutas = [
 
     ],
 
-];
+    'finanzas' => [
 
+        'index' => [
+            FinanzasController::class,
+            'index',
+        ],
+
+        'guardar' => [
+            FinanzasController::class,
+            'guardar',
+        ],
+
+        'anular' => [
+            FinanzasController::class,
+            'anular',
+        ],
+
+    ],
+
+    'reportes' => [
+
+        'index' => [
+            ReporteController::class,
+            'index',
+        ],
+
+    ],
+
+];
 if (
     !isset(
         $rutas[

@@ -139,6 +139,32 @@ $usuarioNavegacion = Auth::usuario();
 
                     </li>
 
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="<?= e(url(
+                                'index.php?controller=finanzas'
+                                . '&action=index'
+                            )) ?>"
+                        >
+                            <i class="bi bi-cash-coin"></i>
+                            Finanzas
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            class="nav-link"
+                            href="<?= e(url(
+                                'index.php?controller=reportes'
+                                . '&action=index'
+                            )) ?>"
+                        >
+                            <i class="bi bi-bar-chart"></i>
+                            Reportes
+                        </a>
+                    </li>
+
                     <li class="nav-item dropdown ms-lg-2">
 
                         <button
