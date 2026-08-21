@@ -9,7 +9,7 @@ final class ActividadController extends Controller
         Auth::exigirLogin();
 
         $usuarioActual = Auth::usuario();
-        $idComunidad   = (int) $usuarioActual['id_comunidad'];
+        $idComunidad = (int) $usuarioActual['id_comunidad'];
 
         $filtroTipo = isset($_GET['tipo'])
             ? (string) $_GET['tipo']
@@ -21,22 +21,29 @@ final class ActividadController extends Controller
 
         $servicio = new ActividadService($repositorio);
 
-        $modulo = $servicio->obtenerModulo($idComunidad, $filtroTipo);
+        $modulo = $servicio->obtenerModulo(
+            $idComunidad,
+            $filtroTipo
+        );
 
         $this->render('actividades/index', [
-            'titulo'        => 'Actividades',
+            'titulo' => 'Actividades',
             'usuarioActual' => $usuarioActual,
-            'resumen'       => $modulo['resumen'],
-            'listado'       => $modulo['listado'],
-            'proximas'      => $modulo['proximas'],
-            'proyectos'     => $modulo['proyectos'],
-            'filtroTipo'    => $filtroTipo,
+            'resumen' => $modulo['resumen'],
+            'listado' => $modulo['listado'],
+            'proximas' => $modulo['proximas'],
+            'proyectos' => $modulo['proyectos'],
+            'filtroTipo' => $filtroTipo,
         ]);
     }
 
     public function guardar(): void
     {
-        Auth::exigirLogin();
+        Auth::exigirRol(
+            'Administrador',
+            'Coordinador'
+        );
+
         $this->exigirMetodo('POST');
 
         if (!Auth::validarCsrf($_POST['csrf_token'] ?? null)) {
@@ -45,7 +52,8 @@ final class ActividadController extends Controller
         }
 
         $usuarioActual = Auth::usuario();
-        $idComunidad   = (int) $usuarioActual['id_comunidad'];
+
+        $idComunidad = (int) $usuarioActual['id_comunidad'];
         $idResponsable = (int) $usuarioActual['id_usuario'];
 
         $repositorio = new ActividadRepository(
@@ -55,11 +63,21 @@ final class ActividadController extends Controller
         $servicio = new ActividadService($repositorio);
 
         try {
-            $servicio->registrar($idComunidad, $idResponsable, $_POST);
+            $servicio->registrar(
+                $idComunidad,
+                $idResponsable,
+                $_POST
+            );
 
-            Auth::flash('exito', 'Actividad registrada correctamente.');
+            Auth::flash(
+                'exito',
+                'Actividad registrada correctamente.'
+            );
         } catch (InvalidArgumentException $error) {
-            Auth::flash('error', $error->getMessage());
+            Auth::flash(
+                'error',
+                $error->getMessage()
+            );
         }
 
         $this->redirect(

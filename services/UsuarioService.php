@@ -50,61 +50,25 @@ final class UsuarioService
             ->listarRolesActivos();
     }
 
-    public function crear(
-        array $datos,
-        int $idComunidad
-    ): int {
-        $datosLimpios =
-            $this->validarDatos(
-                $datos,
-                true
-            );
 
-        if (
-            $this->usuarioRepository->existeCorreo(
-                $datosLimpios['correo']
-            )
-        ) {
-            throw new InvalidArgumentException(
-                'Ya existe un usuario registrado con ese correo.'
-            );
-        }
-
-        if (
-            !$this->usuarioRepository->existeRolActivo(
-                $datosLimpios['id_rol']
-            )
-        ) {
-            throw new InvalidArgumentException(
-                'El rol seleccionado no es válido.'
-            );
-        }
-
-        $datosLimpios['contrasena_hash'] =
-            password_hash(
-                $datosLimpios['contrasena'],
-                PASSWORD_DEFAULT
-            );
-
-        unset($datosLimpios['contrasena']);
-
-        return $this
-            ->usuarioRepository
-            ->crear(
-                $datosLimpios,
-                $idComunidad
-            );
-    }
+    // ------------------ ACTUALIZAR MEMBRESÍA (Solamente cambia el rol y el estado) ------------------
 
     public function actualizar(
         int $idUsuario,
         array $datos,
-        int $idComunidad
+        int $idComunidad,
+        int $idUsuarioActual
     ): void {
         $this->obtener(
             $idUsuario,
             $idComunidad
         );
+
+        if ($idUsuario === $idUsuarioActual) {
+            throw new InvalidArgumentException(
+                'No puedes modificar tu propio rol o estado mientras tienes la sesión iniciada.'
+            );
+        }
 
         $datosMembresia =
             $this->validarMembresia(
@@ -112,9 +76,11 @@ final class UsuarioService
             );
 
         if (
-            !$this->usuarioRepository->existeRolActivo(
-                $datosMembresia['id_rol']
-            )
+            !$this
+                ->usuarioRepository
+                ->existeRolActivo(
+                    $datosMembresia['id_rol']
+                )
         ) {
             throw new InvalidArgumentException(
                 'El rol seleccionado no es válido.'
@@ -130,6 +96,9 @@ final class UsuarioService
             );
     }
 
+
+    // ------------------ DESACTIVAR MEMBRESÍA (No elimina la cuenta del usuario) ------------------
+
     public function eliminar(
         int $idUsuario,
         int $idComunidad,
@@ -142,7 +111,7 @@ final class UsuarioService
 
         if ($idUsuario === $idUsuarioActual) {
             throw new InvalidArgumentException(
-                'No puedes desactivar tu propio usuario mientras tienes la sesión iniciada.'
+                'No puedes desactivar tu propia membresía mientras tienes la sesión iniciada.'
             );
         }
 
@@ -153,6 +122,9 @@ final class UsuarioService
                 $idComunidad
             );
     }
+
+
+    // ------------------ VALIDAR MEMBRESÍA (Revisa el rol y el estado recibidos) ------------------
 
     private function validarMembresia(
         array $datos
@@ -189,122 +161,6 @@ final class UsuarioService
         }
 
         return [
-            'id_rol' => (int) $idRol,
-            'estado' => $estado,
-        ];
-    }
-
-    private function validarDatos(
-        array $datos,
-        bool $esNuevo
-    ): array {
-        $nombre = trim(
-            (string) ($datos['nombre'] ?? '')
-        );
-
-        $correo = strtolower(
-            trim(
-                (string) ($datos['correo'] ?? '')
-            )
-        );
-
-        $telefono = trim(
-            (string) ($datos['telefono'] ?? '')
-        );
-
-        $contrasena = (string) (
-            $datos['contrasena'] ?? ''
-        );
-
-        $idRol = filter_var(
-            $datos['id_rol'] ?? null,
-            FILTER_VALIDATE_INT
-        );
-
-        $estado = trim(
-            (string) ($datos['estado'] ?? '')
-        );
-
-        if (mb_strlen($nombre) < 3) {
-            throw new InvalidArgumentException(
-                'El nombre debe tener al menos 3 caracteres.'
-            );
-        }
-
-        if (mb_strlen($nombre) > 120) {
-            throw new InvalidArgumentException(
-                'El nombre supera el tamaño permitido.'
-            );
-        }
-
-        if (
-            !filter_var(
-                $correo,
-                FILTER_VALIDATE_EMAIL
-            )
-        ) {
-            throw new InvalidArgumentException(
-                'Debes ingresar un correo electrónico válido.'
-            );
-        }
-
-        if (mb_strlen($correo) > 191) {
-            throw new InvalidArgumentException(
-                'El correo supera el tamaño permitido.'
-            );
-        }
-
-        if (mb_strlen($telefono) > 20) {
-            throw new InvalidArgumentException(
-                'El teléfono supera el tamaño permitido.'
-            );
-        }
-
-        if (
-            $esNuevo
-            && strlen($contrasena) < 6
-        ) {
-            throw new InvalidArgumentException(
-                'La contraseña debe tener al menos 6 caracteres.'
-            );
-        }
-
-        if (
-            !$esNuevo
-            && $contrasena !== ''
-            && strlen($contrasena) < 6
-        ) {
-            throw new InvalidArgumentException(
-                'La nueva contraseña debe tener al menos 6 caracteres.'
-            );
-        }
-
-        if ($idRol === false || $idRol <= 0) {
-            throw new InvalidArgumentException(
-                'Debes seleccionar un rol válido.'
-            );
-        }
-
-        if (
-            !in_array(
-                $estado,
-                ['Activo', 'Inactivo'],
-                true
-            )
-        ) {
-            throw new InvalidArgumentException(
-                'El estado seleccionado no es válido.'
-            );
-        }
-
-        return [
-            'nombre' => $nombre,
-            'correo' => $correo,
-            'telefono' =>
-                $telefono === ''
-                    ? null
-                    : $telefono,
-            'contrasena' => $contrasena,
             'id_rol' => (int) $idRol,
             'estado' => $estado,
         ];

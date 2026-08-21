@@ -89,6 +89,17 @@ if (Auth::tieneRol('Administrador')) {
 
         <div class="container">
 
+            <?php if ($error !== null): ?>
+
+                <div
+                    class="alert alert-danger"
+                    role="alert"
+                >
+                    <?= e($error) ?>
+                </div>
+
+            <?php endif; ?>
+
             <!-- ==========================================
                  ENCABEZADO
             =========================================== -->

@@ -15,7 +15,7 @@ final class UsuarioController extends Controller
             [
                 'titulo' => 'Usuarios',
                 'scripts' => [
-                    'assets/js/usuarios.js',
+                    'assets/js/usuarios.js?v=2',
                 ],
             ]
         );
@@ -48,29 +48,19 @@ final class UsuarioController extends Controller
             ->listarRoles();
     }
 
-    public function crear(
-        array $datos,
-        int $idComunidad
-    ): int {
-        return $this
-            ->obtenerUsuarioService()
-            ->crear(
-                $datos,
-                $idComunidad
-            );
-    }
-
     public function actualizar(
-        int $idUsuario,
-        array $datos,
-        int $idComunidad
+    int $idUsuario,
+    array $datos,
+    int $idComunidad,
+    int $idUsuarioActual
     ): void {
         $this
             ->obtenerUsuarioService()
             ->actualizar(
                 $idUsuario,
                 $datos,
-                $idComunidad
+                $idComunidad,
+                $idUsuarioActual
             );
     }
 

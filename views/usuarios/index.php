@@ -1,3 +1,9 @@
+<?php
+
+$usuarioSesion = Auth::usuario();
+
+?>
+
 <main class="main-content">
 
     <section class="modulo-section py-5">
@@ -12,13 +18,18 @@
                 data-csrf-token="<?= e(
                     Auth::csrfToken()
                 ) ?>"
+                data-id-usuario-actual="<?= e(
+                    $usuarioSesion[
+                        'id_usuario'
+                    ] ?? 0
+                ) ?>"
             ></div>
 
             <div id="mensajeUsuarios"></div>
 
             <div class="row align-items-center mb-4">
 
-                <div class="col-12 col-lg-8">
+                <div class="col-12">
 
                     <span
                         class="badge text-bg-success mb-3"
@@ -31,26 +42,9 @@
                     </h1>
 
                     <p class="modulo-text">
-                        Administración de miembros de la
-                        asociación, roles asignados y estado
-                        dentro de la comunidad.
+                        Consulta los miembros y administra
+                        su rol y estado dentro de la comunidad.
                     </p>
-
-                </div>
-
-                <div
-                    class="col-12 col-lg-4
-                    text-lg-end mt-3 mt-lg-0"
-                >
-
-                    <button
-                        type="button"
-                        id="btnNuevoUsuario"
-                        class="btn btn-success btn-lg"
-                    >
-                        <i class="bi bi-person-plus"></i>
-                        Nuevo usuario
-                    </button>
 
                 </div>
 
@@ -63,19 +57,21 @@
                     <div class="modulo-card h-100">
 
                         <h4 id="tituloFormulario">
-                            Registrar usuario
+                            Datos del miembro
                         </h4>
 
                         <p
                             id="textoFormulario"
                             class="text-muted"
                         >
-                            Complete los datos del nuevo
-                            miembro.
+                            Selecciona un usuario de la tabla
+                            para consultar su información.
                         </p>
 
-                        <form id="formUsuario" novalidate>
-
+                        <form
+                            id="formUsuario"
+                            novalidate
+                        >
                             <input
                                 type="hidden"
                                 id="idUsuario"
@@ -105,16 +101,10 @@
                                         type="text"
                                         id="nombre"
                                         class="form-control"
-                                        maxlength="120"
-                                        placeholder="Ej: Ana Rodríguez"
+                                        readonly
                                     >
 
                                 </div>
-
-                                <div
-                                    id="errorNombre"
-                                    class="text-danger small mt-1"
-                                ></div>
 
                             </div>
 
@@ -141,16 +131,10 @@
                                         type="email"
                                         id="correo"
                                         class="form-control"
-                                        maxlength="191"
-                                        placeholder="correo@ejemplo.com"
+                                        readonly
                                     >
 
                                 </div>
-
-                                <div
-                                    id="errorCorreo"
-                                    class="text-danger small mt-1"
-                                ></div>
 
                             </div>
 
@@ -177,56 +161,20 @@
                                         type="text"
                                         id="telefono"
                                         class="form-control"
-                                        maxlength="20"
-                                        placeholder="8888-8888"
+                                        readonly
                                     >
 
                                 </div>
 
                             </div>
 
-                            <div class="mb-3">
-
-                                <label
-                                    for="contrasena"
-                                    class="form-label"
-                                >
-                                    Contraseña
-                                </label>
-
-                                <div class="input-group">
-
-                                    <span
-                                        class="input-group-text"
-                                    >
-                                        <i
-                                            class="bi bi-lock"
-                                        ></i>
-                                    </span>
-
-                                    <input
-                                        type="password"
-                                        id="contrasena"
-                                        class="form-control"
-                                        maxlength="255"
-                                        placeholder="Mínimo 6 caracteres"
-                                    >
-
-                                </div>
-
-                                <div
-                                    id="ayudaContrasena"
-                                    class="form-text"
-                                >
-                                    Es obligatoria al crear
-                                    un usuario.
-                                </div>
-
-                                <div
-                                    id="errorContrasena"
-                                    class="text-danger small mt-1"
-                                ></div>
-
+                            <div
+                                class="alert alert-light
+                                border small"
+                            >
+                                Los datos personales solamente
+                                pueden ser modificados por el
+                                propietario desde su perfil.
                             </div>
 
                             <div class="mb-3">
@@ -235,12 +183,13 @@
                                     for="idRol"
                                     class="form-label"
                                 >
-                                    Rol
+                                    Rol en la comunidad
                                 </label>
 
                                 <select
                                     id="idRol"
                                     class="form-select"
+                                    disabled
                                 >
                                     <option value="">
                                         Seleccione un rol
@@ -260,13 +209,18 @@
                                     for="estado"
                                     class="form-label"
                                 >
-                                    Estado
+                                    Estado de la membresía
                                 </label>
 
                                 <select
                                     id="estado"
                                     class="form-select"
+                                    disabled
                                 >
+                                    <option value="">
+                                        Seleccione un estado
+                                    </option>
+
                                     <option value="Activo">
                                         Activo
                                     </option>
@@ -282,18 +236,20 @@
                                 type="submit"
                                 id="btnGuardarUsuario"
                                 class="btn btn-success w-100"
+                                disabled
                             >
                                 <i class="bi bi-save"></i>
-                                Guardar usuario
+                                Guardar membresía
                             </button>
 
                             <button
                                 type="button"
                                 id="btnCancelarEdicion"
-                                class="btn btn-outline-secondary
+                                class="btn
+                                btn-outline-secondary
                                 w-100 mt-2 d-none"
                             >
-                                Cancelar edición
+                                Limpiar selección
                             </button>
 
                         </form>
@@ -310,18 +266,18 @@
                             class="d-flex flex-column
                             flex-md-row
                             justify-content-between
-                            align-items-md-center mb-4 gap-3"
+                            align-items-md-center
+                            mb-4 gap-3"
                         >
-
                             <div>
 
                                 <h4>
-                                    Usuarios registrados
+                                    Miembros de la comunidad
                                 </h4>
 
                                 <p class="text-muted mb-0">
-                                    Miembros registrados en
-                                    la comunidad actual.
+                                    Personas asociadas con la
+                                    comunidad actual.
                                 </p>
 
                             </div>
@@ -342,7 +298,7 @@
                                         type="text"
                                         id="buscarUsuario"
                                         class="form-control"
-                                        placeholder="Buscar usuario..."
+                                        placeholder="Buscar miembro..."
                                     >
 
                                 </div>
@@ -357,7 +313,6 @@
                                 class="table align-middle
                                 modulo-table"
                             >
-
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
@@ -376,12 +331,11 @@
                                             class="text-center
                                             text-muted py-4"
                                         >
-                                            Cargando usuarios...
+                                            Cargando miembros...
                                         </td>
                                     </tr>
 
                                 </tbody>
-
                             </table>
 
                         </div>

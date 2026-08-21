@@ -62,20 +62,106 @@ final class AuthService
         $membresias = $this->usuarioRepository
             ->obtenerMembresiasActivas($usuario->id());
 
-        if ($membresias === []) {
-            return [
-                'exito' => false,
-                'errores' => [
-                    'general' =>
-                        'Tu cuenta no tiene una comunidad activa asignada.',
-                ],
-            ];
-        }
-
         return [
             'exito' => true,
             'usuario' => $usuario,
             'membresias' => $membresias,
+        ];
+    }
+
+    public function registrarCuenta(
+        array $datos
+    ): array {
+        $nombre = trim(
+            (string) ($datos['nombre'] ?? '')
+        );
+
+        $correo = strtolower(
+            trim(
+                (string) ($datos['correo'] ?? '')
+            )
+        );
+
+        $telefono = trim(
+            (string) ($datos['telefono'] ?? '')
+        );
+
+        $contrasena = (string) (
+            $datos['contrasena'] ?? ''
+        );
+
+        $confirmarContrasena = (string) (
+            $datos['confirmar_contrasena'] ?? ''
+        );
+
+        $errores = [];
+
+        if (mb_strlen($nombre) < 3) {
+            $errores['nombre'] =
+                'El nombre debe tener al menos 3 caracteres.';
+        }
+
+        if (
+            !filter_var(
+                $correo,
+                FILTER_VALIDATE_EMAIL
+            )
+        ) {
+            $errores['correo'] =
+                'Ingresa un correo electrónico válido.';
+        }
+
+        if (strlen($telefono) > 20) {
+            $errores['telefono'] =
+                'El teléfono es demasiado largo.';
+        }
+
+        if (strlen($contrasena) < 6) {
+            $errores['contrasena'] =
+                'La contraseña debe tener al menos 6 caracteres.';
+        }
+
+        if ($contrasena !== $confirmarContrasena) {
+            $errores['confirmar_contrasena'] =
+                'Las contraseñas no coinciden.';
+        }
+
+        if (
+            $correo !== ''
+            && $this->usuarioRepository
+                ->existeCorreo($correo)
+        ) {
+            $errores['correo'] =
+                'Ya existe una cuenta con ese correo.';
+        }
+
+        if ($errores !== []) {
+            return [
+                'exito' => false,
+                'errores' => $errores,
+            ];
+        }
+
+        $idUsuario = $this
+            ->usuarioRepository
+            ->crearCuenta([
+                'nombre' => $nombre,
+                'correo' => $correo,
+                'telefono' =>
+                    $telefono === ''
+                        ? null
+                        : $telefono,
+                'contrasena_hash' =>
+                    password_hash(
+                        $contrasena,
+                        PASSWORD_DEFAULT
+                    ),
+            ]);
+
+        return [
+            'exito' => true,
+            'id_usuario' => $idUsuario,
+            'errores' => [],
         ];
     }
 

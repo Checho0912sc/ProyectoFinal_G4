@@ -95,6 +95,41 @@ final class UsuarioRepository
         ]);
     }
 
+    public function crearCuenta(
+        array $datos
+    ): int {
+        $sql = <<<'SQL'
+            INSERT INTO usuarios (
+                nombre,
+                correo,
+                contrasena_hash,
+                telefono,
+                estado
+            )
+            VALUES (
+                :nombre,
+                :correo,
+                :contrasena_hash,
+                :telefono,
+                'Activo'
+            )
+        SQL;
+
+        $consulta =
+            $this->conexion->prepare($sql);
+
+        $consulta->execute([
+            'nombre' => $datos['nombre'],
+            'correo' => $datos['correo'],
+            'contrasena_hash' =>
+                $datos['contrasena_hash'],
+            'telefono' => $datos['telefono'],
+        ]);
+
+        return (int)
+            $this->conexion->lastInsertId();
+    }
+
     /* =========================================================
        CRUD DE USUARIOS
        ========================================================= */
@@ -234,107 +269,30 @@ final class UsuarioRepository
         return (int) $consulta->fetchColumn() > 0;
     }
 
-    public function crear(
-        array $datos,
-        int $idComunidad
-    ): int {
-        try {
-            $this->conexion->beginTransaction();
-
-            $sqlUsuario = <<<'SQL'
-                INSERT INTO usuarios (
-                    nombre,
-                    correo,
-                    contrasena_hash,
-                    telefono,
-                    estado
-                )
-                VALUES (
-                    :nombre,
-                    :correo,
-                    :contrasena_hash,
-                    :telefono,
-                    'Activo'
-                )
-            SQL;
-
-            $consultaUsuario =
-                $this->conexion->prepare($sqlUsuario);
-
-            $consultaUsuario->execute([
-                'nombre' => $datos['nombre'],
-                'correo' => $datos['correo'],
-                'contrasena_hash' =>
-                    $datos['contrasena_hash'],
-                'telefono' => $datos['telefono'],
-            ]);
-
-            $idUsuario = (int)
-                $this->conexion->lastInsertId();
-
-            $sqlComunidad = <<<'SQL'
-                INSERT INTO usuario_comunidad (
-                    id_comunidad,
-                    id_usuario,
-                    id_rol,
-                    fecha_ingreso,
-                    estado
-                )
-                VALUES (
-                    :id_comunidad,
-                    :id_usuario,
-                    :id_rol,
-                    CURRENT_DATE,
-                    :estado
-                )
-            SQL;
-
-            $consultaComunidad =
-                $this->conexion->prepare($sqlComunidad);
-
-            $consultaComunidad->execute([
-                'id_comunidad' => $idComunidad,
-                'id_usuario' => $idUsuario,
-                'id_rol' => $datos['id_rol'],
-                'estado' => $datos['estado'],
-            ]);
-
-            $this->conexion->commit();
-
-            return $idUsuario;
-        } catch (Throwable $error) {
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
-
-            throw $error;
-        }
-    }
-
     public function actualizar(
-    int $idUsuario,
-    int $idComunidad,
-    array $datos
-): void {
-    $sql = <<<'SQL'
-        UPDATE usuario_comunidad
-        SET
-            id_rol = :id_rol,
-            estado = :estado
-        WHERE id_usuario = :id_usuario
-          AND id_comunidad = :id_comunidad
-    SQL;
+        int $idUsuario,
+        int $idComunidad,
+        array $datos
+    ): void {
+        $sql = <<<'SQL'
+            UPDATE usuario_comunidad
+            SET
+                id_rol = :id_rol,
+                estado = :estado
+            WHERE id_usuario = :id_usuario
+            AND id_comunidad = :id_comunidad
+        SQL;
 
-    $consulta =
-        $this->conexion->prepare($sql);
+        $consulta =
+            $this->conexion->prepare($sql);
 
-    $consulta->execute([
-        'id_rol' => $datos['id_rol'],
-        'estado' => $datos['estado'],
-        'id_usuario' => $idUsuario,
-        'id_comunidad' => $idComunidad,
-    ]);
-}
+        $consulta->execute([
+            'id_rol' => $datos['id_rol'],
+            'estado' => $datos['estado'],
+            'id_usuario' => $idUsuario,
+            'id_comunidad' => $idComunidad,
+        ]);
+    }
 
     public function desactivarEnComunidad(
         int $idUsuario,
@@ -352,6 +310,82 @@ final class UsuarioRepository
         $consulta->execute([
             'id_usuario' => $idUsuario,
             'id_comunidad' => $idComunidad,
+        ]);
+    }
+
+    // ------------------ BUSCAR PERFIL (Obtiene los datos personales del usuario conectado) ------------------
+    public function buscarPerfilPorId(
+        int $idUsuario
+    ): ?array {
+        $sql = <<<'SQL'
+            SELECT
+                id_usuario,
+                nombre,
+                correo,
+                telefono
+            FROM usuarios
+            WHERE id_usuario = :id_usuario
+            LIMIT 1
+        SQL;
+
+        $consulta =
+            $this->conexion->prepare($sql);
+
+        $consulta->execute([
+            'id_usuario' => $idUsuario,
+        ]);
+
+        $perfil = $consulta->fetch();
+
+        return $perfil === false
+            ? null
+            : $perfil;
+    }
+
+
+    // ------------------ ACTUALIZAR PERFIL (Modifica nombre, correo y teléfono) ------------------
+    public function actualizarPerfil(
+        int $idUsuario,
+        array $datos
+    ): void {
+        $sql = <<<'SQL'
+            UPDATE usuarios
+            SET
+                nombre = :nombre,
+                correo = :correo,
+                telefono = :telefono
+            WHERE id_usuario = :id_usuario
+        SQL;
+
+        $consulta =
+            $this->conexion->prepare($sql);
+
+        $consulta->execute([
+            'nombre' => $datos['nombre'],
+            'correo' => $datos['correo'],
+            'telefono' => $datos['telefono'],
+            'id_usuario' => $idUsuario,
+        ]);
+    }
+
+
+    // ------------------ CAMBIAR CONTRASEÑA (Guarda la nueva contraseña cifrada) ------------------
+    public function actualizarContrasena(
+        int $idUsuario,
+        string $contrasenaHash
+    ): void {
+        $sql = <<<'SQL'
+            UPDATE usuarios
+            SET contrasena_hash = :contrasena_hash
+            WHERE id_usuario = :id_usuario
+        SQL;
+
+        $consulta =
+            $this->conexion->prepare($sql);
+
+        $consulta->execute([
+            'contrasena_hash' => $contrasenaHash,
+            'id_usuario' => $idUsuario,
         ]);
     }
 }

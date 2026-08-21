@@ -199,6 +199,59 @@ $usuarioNavegacion = Auth::usuario();
                             </li>
 
                             <li>
+                                <a
+                                    class="dropdown-item"
+                                    href="<?= e(url(
+                                        'index.php?controller=perfil'
+                                        . '&action=index'
+                                    )) ?>"
+                                >
+                                    <i class="bi bi-person-gear me-2"></i>
+                                    Mi perfil
+                                </a>
+
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
+                                <form
+                                    action="<?= e(url(
+                                        'index.php?controller=comunidad'
+                                        . '&action=salir'
+                                    )) ?>"
+                                    method="post"
+                                    onsubmit="return confirm(
+                                        '¿Seguro que deseas salir de la comunidad?'
+                                    );"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="<?= e(
+                                            Auth::csrfToken()
+                                        ) ?>"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="dropdown-item text-danger"
+                                    >
+                                        <i
+                                            class="bi bi-building-dash me-2"
+                                        ></i>
+                                        Salir de la comunidad
+                                    </button>
+                                </form>
+                            </li>
+
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+
+                            <li>
 
                                 <form
                                     action="<?= e(url(

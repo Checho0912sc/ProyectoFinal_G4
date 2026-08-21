@@ -9,23 +9,59 @@ final class GrupoService
     ) {
     }
 
-    public function obtenerModulo(int $idComunidad): array
-    {
+    public function obtenerModulo(
+        int $idComunidad
+    ): array {
         return [
             'resumen' => [
-                'comites' => $this->grupoRepository->contarActivosPorComunidad($idComunidad),
-                'miembros' => $this->grupoRepository->contarMiembrosActivos($idComunidad),
-                'tareas' => $this->grupoRepository->contarTareasEnCurso($idComunidad),
-                'proyectos' => $this->grupoRepository->contarProyectosApoyados($idComunidad),
+                'comites' =>
+                    $this->grupoRepository
+                        ->contarActivosPorComunidad(
+                            $idComunidad
+                        ),
+
+                'miembros' =>
+                    $this->grupoRepository
+                        ->contarMiembrosActivos(
+                            $idComunidad
+                        ),
+
+                'tareas' =>
+                    $this->grupoRepository
+                        ->contarTareasEnCurso(
+                            $idComunidad
+                        ),
+
+                'proyectos' =>
+                    $this->grupoRepository
+                        ->contarProyectosApoyados(
+                            $idComunidad
+                        ),
             ],
 
-            'grupos' => $this->grupoRepository->listarPorComunidad($idComunidad),
+            'grupos' =>
+                $this->grupoRepository
+                    ->listarPorComunidad(
+                        $idComunidad
+                    ),
 
-            'coordinadores' => $this->grupoRepository->listarCoordinadores($idComunidad),
+            'coordinadores' =>
+                $this->grupoRepository
+                    ->listarCoordinadores(
+                        $idComunidad
+                    ),
 
-            'tareas' => $this->grupoRepository->listarTareasRecientes($idComunidad),
+            'tareas' =>
+                $this->grupoRepository
+                    ->listarTareasRecientes(
+                        $idComunidad
+                    ),
 
-            'miembros' => $this->grupoRepository->listarMiembrosDeComunidad($idComunidad),
+            'miembros' =>
+                $this->grupoRepository
+                    ->listarMiembrosDeComunidad(
+                        $idComunidad
+                    ),
         ];
     }
 
@@ -33,26 +69,61 @@ final class GrupoService
         int $idComunidad,
         array $post
     ): void {
-        $nombre = trim((string) ($post['nombre'] ?? ''));
-        $area = trim((string) ($post['area'] ?? ''));
-        $descripcion = trim((string) ($post['descripcion'] ?? ''));
-        $idResponsable = (int) ($post['id_responsable'] ?? 0);
+        $nombre = trim(
+            (string) ($post['nombre'] ?? '')
+        );
+
+        $area = trim(
+            (string) ($post['area'] ?? '')
+        );
+
+        $descripcion = trim(
+            (string) ($post['descripcion'] ?? '')
+        );
+
+        $idResponsable = (int) (
+            $post['id_responsable'] ?? 0
+        );
 
         if (strlen($nombre) < 3) {
             throw new InvalidArgumentException(
-                'El nombre del comité debe tener al menos 3 caracteres'
+                'El nombre del comité debe tener al menos 3 caracteres.'
             );
         }
 
         if ($area === '') {
             throw new InvalidArgumentException(
-                'Debe seleccionar el área del comité'
+                'Debe seleccionar el área del comité.'
             );
         }
 
         if ($idResponsable <= 0) {
             throw new InvalidArgumentException(
-                'Debe seleccionar un responsable'
+                'Debe seleccionar un responsable.'
+            );
+        }
+
+        if (
+            !$this->grupoRepository
+                ->usuarioPerteneceAComunidad(
+                    $idResponsable,
+                    $idComunidad
+                )
+        ) {
+            throw new InvalidArgumentException(
+                'El responsable seleccionado no pertenece a la comunidad actual.'
+            );
+        }
+
+        if (
+            $this->grupoRepository
+                ->existeNombreEnComunidad(
+                    $nombre,
+                    $idComunidad
+                )
+        ) {
+            throw new InvalidArgumentException(
+                'Ya existe un comité con ese nombre en la comunidad.'
             );
         }
 
@@ -65,21 +136,58 @@ final class GrupoService
         ]);
     }
 
-    public function asociarMiembro(array $post): void
-    {
-        $idGrupo = (int) ($post['id_grupo'] ?? 0);
-        $idUsuario = (int) ($post['id_usuario'] ?? 0);
-        $rolGrupo = trim((string) ($post['rol_grupo'] ?? 'Colaborador'));
+    public function asociarMiembro(
+        int $idComunidad,
+        array $post
+    ): void {
+        $idGrupo = (int) (
+            $post['id_grupo'] ?? 0
+        );
+
+        $idUsuario = (int) (
+            $post['id_usuario'] ?? 0
+        );
+
+        $rolGrupo = trim(
+            (string) (
+                $post['rol_grupo']
+                ?? 'Colaborador'
+            )
+        );
 
         if ($idGrupo <= 0) {
             throw new InvalidArgumentException(
-                'Debe seleccionar un comité'
+                'Debe seleccionar un comité.'
             );
         }
 
         if ($idUsuario <= 0) {
             throw new InvalidArgumentException(
-                'Debe seleccionar un miembro'
+                'Debe seleccionar un miembro.'
+            );
+        }
+
+        if (
+            !$this->grupoRepository
+                ->grupoPerteneceAComunidad(
+                    $idGrupo,
+                    $idComunidad
+                )
+        ) {
+            throw new InvalidArgumentException(
+                'El comité seleccionado no pertenece a la comunidad actual.'
+            );
+        }
+
+        if (
+            !$this->grupoRepository
+                ->usuarioPerteneceAComunidad(
+                    $idUsuario,
+                    $idComunidad
+                )
+        ) {
+            throw new InvalidArgumentException(
+                'El miembro seleccionado no pertenece a la comunidad actual.'
             );
         }
 
