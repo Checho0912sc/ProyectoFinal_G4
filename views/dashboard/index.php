@@ -53,12 +53,12 @@ $accesos = [
     ],
     [
         'nombre' => 'Finanzas',
-        'ruta' => 'finanzas.html',
+        'ruta' => 'index.php?controller=finanzas&action=index',
         'icono' => 'bi-cash-coin',
     ],
     [
         'nombre' => 'Reportes',
-        'ruta' => 'reportes.html',
+        'ruta' => 'index.php?controller=reportes&action=index',
         'icono' => 'bi-bar-chart',
     ],
 ];
